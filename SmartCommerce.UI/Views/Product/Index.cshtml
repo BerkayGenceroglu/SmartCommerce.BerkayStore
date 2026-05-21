@@ -1,0 +1,850 @@
+﻿@{
+    ViewData["Title"] = "Ürünler";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .products-page {
+        display: grid;
+        grid-template-columns: 260px 1fr;
+        gap: 0;
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem;
+        min-height: 80vh;
+    }
+
+    .filter-sidebar {
+        padding-right: 2rem;
+        border-right: 1px solid var(--border);
+        position: sticky;
+        top: calc(var(--nav-height) + 32px + 1rem);
+        max-height: calc(100vh - var(--nav-height) - 32px - 2rem);
+        overflow-y: auto;
+        scrollbar-width: none;
+    }
+
+        .filter-sidebar::-webkit-scrollbar {
+            display: none;
+        }
+
+    .filter-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1.5rem;
+    }
+
+        .filter-header h3 {
+            font-family: var(--font-display);
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text);
+        }
+
+    .filter-clear {
+        font-size: 0.75rem;
+        color: var(--accent);
+        cursor: pointer;
+        background: none;
+        border: none;
+        font-family: var(--font-body);
+    }
+
+    .filter-section {
+        margin-bottom: 1.75rem;
+        padding-bottom: 1.75rem;
+        border-bottom: 1px solid var(--border);
+    }
+
+        .filter-section:last-child {
+            border-bottom: none;
+        }
+
+        .filter-section h4 {
+            font-family: var(--font-display);
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            margin-bottom: 0.85rem;
+        }
+
+    .filter-option {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 0.3rem 0;
+        cursor: pointer;
+    }
+
+        .filter-option input[type="checkbox"] {
+            width: 15px;
+            height: 15px;
+            accent-color: var(--accent);
+            cursor: pointer;
+        }
+
+        .filter-option label {
+            font-size: 0.83rem;
+            color: var(--text-dim);
+            cursor: pointer;
+            transition: color 0.2s;
+            flex: 1;
+        }
+
+        .filter-option:hover label {
+            color: var(--text);
+        }
+
+    .filter-count {
+        display: none;
+    }
+
+    .price-inputs {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+    }
+
+        .price-inputs input {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-family: var(--font-body);
+            font-size: 0.82rem;
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            outline: none;
+            transition: border-color 0.2s;
+            width: 100%;
+        }
+
+            .price-inputs input:focus {
+                border-color: var(--accent);
+            }
+
+            .price-inputs input::placeholder {
+                color: var(--text-muted);
+            }
+
+    .btn-filter-apply {
+        width: 100%;
+        background: var(--accent);
+        color: #fff;
+        border: none;
+        font-family: var(--font-display);
+        font-weight: 700;
+        font-size: 0.78rem;
+        letter-spacing: 0.05em;
+        padding: 0.6rem;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: opacity 0.2s;
+        margin-top: 0.5rem;
+    }
+
+        .btn-filter-apply:hover {
+            opacity: 0.88;
+        }
+
+    .products-area {
+        padding-left: 2rem;
+    }
+
+    .products-topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1.5rem;
+    }
+
+        .products-topbar h2 {
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+            .products-topbar h2 span {
+                font-size: 0.85rem;
+                font-weight: 400;
+                color: var(--text-muted);
+                margin-left: 0.5rem;
+            }
+
+    .products-sort {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+        .products-sort label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .products-sort select {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-family: var(--font-body);
+            font-size: 0.82rem;
+            padding: 0.4rem 0.75rem;
+            border-radius: 6px;
+            outline: none;
+            cursor: pointer;
+        }
+
+    .active-filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+        margin-bottom: 1rem;
+    }
+
+    .filter-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        background: rgba(26,107,60,0.08);
+        border: 1px solid rgba(26,107,60,0.2);
+        color: var(--accent);
+        font-size: 0.75rem;
+        font-weight: 500;
+        padding: 0.25rem 0.6rem;
+        border-radius: 20px;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+        .filter-tag:hover {
+            background: rgba(26,107,60,0.15);
+        }
+
+        .filter-tag i {
+            font-size: 0.65rem;
+        }
+
+    .product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+        gap: 1.25rem;
+    }
+
+    .product-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        overflow: hidden;
+        transition: transform 0.2s, box-shadow 0.2s;
+        cursor: pointer;
+        text-decoration: none;
+        color: inherit;
+        display: block;
+    }
+
+        .product-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+        }
+
+    .product-img {
+        aspect-ratio: 1;
+        background: var(--surface2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        color: var(--border);
+        position: relative;
+        overflow: hidden;
+    }
+
+        .product-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+
+    .product-card:hover .product-img img {
+        transform: scale(1.04);
+    }
+
+    .product-badge {
+        position: absolute;
+        top: 0.75rem;
+        left: 0.75rem;
+        background: var(--accent);
+        color: #fff;
+        font-size: 0.62rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        padding: 0.2rem 0.5rem;
+        border-radius: 4px;
+        z-index: 1;
+    }
+
+    .product-fav {
+        position: absolute;
+        top: 0.75rem;
+        right: 0.75rem;
+        width: 30px;
+        height: 30px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        cursor: pointer;
+        opacity: 0;
+        transition: opacity 0.2s, color 0.2s, border-color 0.2s;
+        z-index: 1;
+    }
+
+    .product-card:hover .product-fav {
+        opacity: 1;
+    }
+
+    .product-fav:hover {
+        color: #e74c3c;
+        border-color: #e74c3c;
+    }
+
+    .product-fav.active {
+        color: #e74c3c;
+        border-color: #e74c3c;
+        opacity: 1;
+    }
+
+    .product-info {
+        padding: 1rem;
+    }
+
+    .product-brand {
+        font-size: 0.68rem;
+        color: var(--accent);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        margin-bottom: 0.2rem;
+    }
+
+    .product-name {
+        font-family: var(--font-display);
+        font-size: 0.88rem;
+        font-weight: 600;
+        color: var(--text);
+        margin-bottom: 0.5rem;
+        line-height: 1.3;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .product-price {
+        font-family: var(--font-display);
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--accent);
+    }
+
+    .product-stock {
+        font-size: 0.7rem;
+        color: var(--text-muted);
+        margin-top: 0.2rem;
+    }
+
+    .product-footer {
+        padding: 0 1rem 1rem;
+    }
+
+    .btn-add-cart {
+        width: 100%;
+        background: var(--accent);
+        color: #fff;
+        border: none;
+        font-family: var(--font-display);
+        font-weight: 700;
+        font-size: 0.78rem;
+        letter-spacing: 0.05em;
+        padding: 0.6rem;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: opacity 0.2s, transform 0.1s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.4rem;
+    }
+
+        .btn-add-cart:hover {
+            opacity: 0.88;
+            transform: translateY(-1px);
+        }
+
+        .btn-add-cart:active {
+            transform: translateY(0);
+        }
+
+        .btn-add-cart:disabled {
+            background: var(--surface2);
+            color: var(--text-muted);
+            cursor: not-allowed;
+            transform: none;
+            opacity: 1;
+        }
+
+    .empty-state {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 4rem 2rem;
+    }
+
+        .empty-state i {
+            font-size: 3rem;
+            color: var(--border);
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .empty-state h3 {
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            color: var(--text-dim);
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+    .skeleton {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        overflow: hidden;
+        animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    .skeleton-img {
+        aspect-ratio: 1;
+        background: var(--surface2);
+    }
+
+    .skeleton-info {
+        padding: 1rem;
+    }
+
+    .skeleton-line {
+        height: 10px;
+        background: var(--surface2);
+        border-radius: 4px;
+        margin-bottom: 0.5rem;
+    }
+
+        .skeleton-line.short {
+            width: 60%;
+        }
+
+        .skeleton-line.medium {
+            width: 80%;
+        }
+
+    @@keyframes pulse {
+        0%, 100% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0.6;
+        }
+    }
+</style>
+
+<div class="products-page">
+    <aside class="filter-sidebar">
+        <div class="filter-header">
+            <h3>Filtrele</h3>
+            <button class="filter-clear" onclick="clearFilters()">Temizle</button>
+        </div>
+
+        <div class="filter-section">
+            <h4>Kategori</h4>
+            <div id="categoryFilters"></div>
+        </div>
+
+        <div class="filter-section">
+            <h4>Marka</h4>
+            <div id="brandFilters"></div>
+        </div>
+
+        <div class="filter-section">
+            <h4>Fiyat Aralığı</h4>
+            <div class="price-inputs">
+                <input type="number" id="minPrice" placeholder="Min ₺" />
+                <input type="number" id="maxPrice" placeholder="Max ₺" />
+            </div>
+            <button class="btn-filter-apply" onclick="applyFilters()">Uygula</button>
+        </div>
+
+        <div class="filter-section">
+            <h4>Stok Durumu</h4>
+            <div class="filter-option">
+                <input type="checkbox" id="inStock" onchange="applyFilters()" />
+                <label for="inStock">Stokta var</label>
+            </div>
+        </div>
+    </aside>
+
+    <main class="products-area">
+        <div class="products-topbar">
+            <h2>Tüm Ürünler <span id="productCount"></span></h2>
+            <div class="products-sort">
+                <label>Sırala:</label>
+                <select id="sortSelect" onchange="applyFilters()">
+                    <option value="default">Önerilen</option>
+                    <option value="price-asc">Fiyat (Artan)</option>
+                    <option value="price-desc">Fiyat (Azalan)</option>
+                    <option value="name-asc">İsim (A-Z)</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="activeFilters" class="active-filters"></div>
+
+        <div id="productGrid" class="product-grid">
+            @for (int i = 0; i < 8; i++)
+            {
+                <div class="skeleton">
+                    <div class="skeleton-img"></div>
+                    <div class="skeleton-info">
+                        <div class="skeleton-line short"></div>
+                        <div class="skeleton-line medium"></div>
+                        <div class="skeleton-line short"></div>
+                    </div>
+                </div>
+            }
+        </div>
+    </main>
+</div>
+
+@section Scripts {
+    <script>
+        let allProducts = [];
+        let categories = [];
+        let userFavorites = [];
+        const token = '@Context.Session.GetString("Token")';
+
+        const categoryIcons = {
+            'Elektronik': 'fa-mobile-screen',
+            'Giyim': 'fa-shirt',
+            'Spor': 'fa-dumbbell',
+            'Bakım & Kozmetik': 'fa-pump-soap',
+            'Ev & Yaşam': 'fa-couch',
+            'Kitap': 'fa-book',
+            'Evcil Hayvan': 'fa-paw'
+        };
+
+        async function loadProducts() {
+            try {
+                const res = await fetch('https://localhost:7136/api/product');
+                allProducts = await res.json();
+                renderProducts(allProducts);
+                loadCategories();
+                renderBrands(allProducts);
+            } catch (e) {
+                document.getElementById('productGrid').innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-triangle-exclamation"></i>
+                        <h3>Ürünler yüklenemedi</h3>
+                        <p>Lütfen daha sonra tekrar deneyin.</p>
+                    </div>`;
+            }
+        }
+
+        async function loadUserFavorites() {
+            if (!token) return;
+            try {
+                const res = await fetch('https://localhost:7136/api/favorites', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                userFavorites = await res.json();
+                // Favori olan ürünlerin butonlarını işaretle
+                userFavorites.forEach(f => {
+                    const btn = document.querySelector(`.product-fav[data-id="${f.productId}"]`);
+                    if (btn) {
+                        btn.classList.add('active');
+                        btn.querySelector('i').className = 'fas fa-heart';
+                    }
+                });
+            } catch (e) {}
+        }
+
+        async function loadCategories() {
+            try {
+                const res = await fetch('https://localhost:7136/api/category');
+                categories = await res.json();
+                renderCategories();
+            } catch (e) {}
+        }
+
+        function renderCategories() {
+            const counts = {};
+            allProducts.forEach(p => counts[p.categoryName] = (counts[p.categoryName] || 0) + 1);
+
+            document.getElementById('categoryFilters').innerHTML = categories.map(c => `
+                <div class="filter-option">
+                    <input type="checkbox" id="cat_${c.id}" value="${c.name}" onchange="applyFilters(); renderBrandsByCategory()" />
+                    <label for="cat_${c.id}">${c.name}</label>
+                </div>
+            `).join('');
+        }
+
+        function renderBrands(products) {
+            const brandCounts = {};
+            products.forEach(p => {
+                if (p.brand) brandCounts[p.brand] = (brandCounts[p.brand] || 0) + 1;
+            });
+
+            const sorted = Object.entries(brandCounts).sort((a, b) => b[1] - a[1]).slice(0, 15);
+
+            document.getElementById('brandFilters').innerHTML = sorted.map(([brand, count]) => `
+                <div class="filter-option">
+                    <input type="checkbox" id="brand_${brand.replace(/[^a-zA-Z0-9]/g,'_')}" value="${brand}" onchange="applyFilters()" />
+                    <label for="brand_${brand.replace(/[^a-zA-Z0-9]/g,'_')}">${brand}</label>
+                    <span class="filter-count">${count}</span>
+                </div>
+            `).join('');
+        }
+
+        function renderBrandsByCategory() {
+            const checkedCats = [...document.querySelectorAll('#categoryFilters input:checked')].map(i => i.value);
+            const filtered = checkedCats.length > 0
+                ? allProducts.filter(p => checkedCats.includes(p.categoryName))
+                : allProducts;
+            renderBrands(filtered);
+        }
+
+        function renderProducts(products) {
+            document.getElementById('productCount').textContent = `(${products.length} ürün)`;
+
+            if (products.length === 0) {
+                document.getElementById('productGrid').innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-box-open"></i>
+                        <h3>Ürün bulunamadı</h3>
+                        <p>Farklı filtreler deneyin.</p>
+                    </div>`;
+                return;
+            }
+
+            document.getElementById('productGrid').innerHTML = products.map(p => {
+                const isFav = userFavorites.some(f => f.productId === p.id);
+                return `
+                    <a href="/Product/Detail/${p.id}" class="product-card">
+                        <div class="product-img">
+                            ${p.imageUrl
+                                ? `<img src="${p.imageUrl}" alt="${p.name}" onerror="this.style.display='none';this.parentElement.querySelector('i').style.display='flex'" /><i class="fas ${categoryIcons[p.categoryName] || 'fa-box'}" style="display:none;position:absolute"></i>`
+                                : `<i class="fas ${categoryIcons[p.categoryName] || 'fa-box'}"></i>`
+                            }
+                            <span class="product-badge">Yeni</span>
+                            <button class="product-fav ${isFav ? 'active' : ''}" data-id="${p.id}" onclick="event.preventDefault(); toggleFav(this, '${p.id}')">
+                                <i class="${isFav ? 'fas' : 'far'} fa-heart"></i>
+                            </button>
+                        </div>
+                        <div class="product-info">
+                            <div class="product-brand">${p.brand || ''}</div>
+                            <div class="product-name">${p.name}</div>
+                            <div class="product-price">${p.price.toLocaleString('tr-TR')}₺</div>
+                            <div class="product-stock">${p.stock > 0 ? `Stokta ${p.stock} adet` : '<span style="color:#e74c3c">Tükendi</span>'}</div>
+                        </div>
+                        <div class="product-footer">
+                            <button class="btn-add-cart" ${p.stock === 0 ? 'disabled' : ''} onclick="event.preventDefault(); addToCart('${p.id}', '${p.name.replace(/'/g, "\\'")}', ${p.price})">
+                                <i class="fas fa-bag-shopping"></i> ${p.stock === 0 ? 'Tükendi' : 'Sepete Ekle'}
+                            </button>
+                        </div>
+                    </a>
+                `;
+            }).join('');
+        }
+
+        function renderActiveFilters() {
+            const tags = [];
+            const checkedCats = [...document.querySelectorAll('#categoryFilters input:checked')].map(i => i.value);
+            const checkedBrands = [...document.querySelectorAll('#brandFilters input:checked')].map(i => i.value);
+            const min = document.getElementById('minPrice').value;
+            const max = document.getElementById('maxPrice').value;
+
+            checkedCats.forEach(c => tags.push(`<span class="filter-tag" onclick="removeCatFilter('${c}')"><i class="fas fa-xmark"></i>${c}</span>`));
+            checkedBrands.forEach(b => tags.push(`<span class="filter-tag" onclick="removeBrandFilter('${b}')"><i class="fas fa-xmark"></i>${b}</span>`));
+            if (min || max) tags.push(`<span class="filter-tag" onclick="clearPriceFilter()"><i class="fas fa-xmark"></i>${min || '0'}₺ - ${max || '∞'}₺</span>`);
+
+            document.getElementById('activeFilters').innerHTML = tags.join('');
+        }
+
+        function removeCatFilter(cat) {
+            const el = document.querySelector(`#categoryFilters input[value="${cat}"]`);
+            if (el) { el.checked = false; applyFilters(); renderBrandsByCategory(); }
+        }
+
+        function removeBrandFilter(brand) {
+            const el = document.querySelector(`#brandFilters input[value="${brand}"]`);
+            if (el) { el.checked = false; applyFilters(); }
+        }
+
+        function clearPriceFilter() {
+            document.getElementById('minPrice').value = '';
+            document.getElementById('maxPrice').value = '';
+            applyFilters();
+        }
+
+        function applyFilters() {
+            let filtered = [...allProducts];
+
+            const checkedCats = [...document.querySelectorAll('#categoryFilters input:checked')].map(i => i.value);
+            if (checkedCats.length > 0) filtered = filtered.filter(p => checkedCats.includes(p.categoryName));
+
+            const checkedBrands = [...document.querySelectorAll('#brandFilters input:checked')].map(i => i.value);
+            if (checkedBrands.length > 0) filtered = filtered.filter(p => checkedBrands.includes(p.brand));
+
+            const min = parseFloat(document.getElementById('minPrice').value) || 0;
+            const max = parseFloat(document.getElementById('maxPrice').value) || Infinity;
+            filtered = filtered.filter(p => p.price >= min && p.price <= max);
+
+            if (document.getElementById('inStock').checked) filtered = filtered.filter(p => p.stock > 0);
+
+            const sort = document.getElementById('sortSelect').value;
+            if (sort === 'price-asc') filtered.sort((a, b) => a.price - b.price);
+            else if (sort === 'price-desc') filtered.sort((a, b) => b.price - a.price);
+            else if (sort === 'name-asc') filtered.sort((a, b) => a.name.localeCompare(b.name));
+
+            renderActiveFilters();
+            renderProducts(filtered);
+        }
+
+        function clearFilters() {
+            document.querySelectorAll('#categoryFilters input, #brandFilters input').forEach(i => i.checked = false);
+            document.getElementById('inStock').checked = false;
+            document.getElementById('sortSelect').value = 'default';
+            document.getElementById('minPrice').value = '';
+            document.getElementById('maxPrice').value = '';
+            renderBrands(allProducts);
+            renderActiveFilters();
+            renderProducts(allProducts);
+        }
+
+        async function toggleFav(btn, productId) {
+            if (!token) { window.location.href = '/Auth/Login'; return; }
+
+            const isActive = btn.classList.contains('active');
+            const icon = btn.querySelector('i');
+
+            try {
+                if (isActive) {
+                    const res = await fetch(`https://localhost:7136/api/favorites/${productId}`, {
+                        method: 'DELETE',
+                        headers: { 'Authorization': 'Bearer ' + token }
+                    });
+                    if (res.ok) {
+                        btn.classList.remove('active');
+                        icon.className = 'far fa-heart';
+                        userFavorites = userFavorites.filter(f => f.productId !== productId);
+                        showToast('Favorilerden kaldırıldı.');
+                    }
+                } else {
+                    const res = await fetch(`https://localhost:7136/api/favorites/${productId}`, {
+                        method: 'POST',
+                        headers: { 'Authorization': 'Bearer ' + token }
+                    });
+                    if (res.ok) {
+                        const fav = await res.json();
+                        btn.classList.add('active');
+                        icon.className = 'fas fa-heart';
+                        userFavorites.push(fav);
+                        showToast('Favorilere eklendi!');
+                    }
+                }
+            } catch (e) { showToast('Bir hata oluştu.'); }
+        }
+
+        async function addToCart(productId, productName, unitPrice) {
+            if (!token) { window.location.href = '/Auth/Login'; return; }
+
+            try {
+                const res = await fetch('https://localhost:7124/api/cart/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({ productId, productName, unitPrice, quantity: 1 })
+                });
+
+                if (res.ok) {
+                    showToast(`${productName} sepete eklendi!`);
+                    updateCartBadge();
+                }
+            } catch (e) { showToast('Bir hata oluştu.'); }
+        }
+
+        async function updateCartBadge() {
+            if (!token) return;
+            try {
+                const res = await fetch('https://localhost:7124/api/cart', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                const cart = await res.json();
+                const total = cart.items?.reduce((s, i) => s + i.quantity, 0) || 0;
+                document.getElementById('cartCount').textContent = total;
+            } catch (e) {}
+        }
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const searchQuery = urlParams.get('search');
+
+        // Önce favorileri yükle, sonra ürünleri render et
+                async function init() {
+            await loadUserFavorites();
+            await loadProducts();
+            await loadCategories(); // ← ekle
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const searchQuery = urlParams.get('search');
+            const categoryQuery = urlParams.get('category');
+
+            if (searchQuery) {
+                const filtered = allProducts.filter(p =>
+                    p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    p.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    p.brand?.toLowerCase().includes(searchQuery.toLowerCase())
+                );
+                renderProducts(filtered);
+            } else if (categoryQuery) {
+                const checkbox = document.querySelector(`#categoryFilters input[value="${categoryQuery}"]`);
+                if (checkbox) {
+                    checkbox.checked = true;
+                    applyFilters();
+                    renderBrandsByCategory();
+                } else {
+                    const filtered = allProducts.filter(p => p.categoryName === categoryQuery);
+                    renderProducts(filtered);
+                }
+            }
+
+            updateCartBadge();
+        }
+
+        init();
+    </script>
+}

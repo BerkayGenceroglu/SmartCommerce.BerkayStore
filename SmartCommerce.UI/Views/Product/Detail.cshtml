@@ -1,0 +1,1222 @@
+﻿@{
+    ViewData["Title"] = "Ürün Detay";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .detail-page {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-bottom: 2rem;
+    }
+
+        .breadcrumb a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+            .breadcrumb a:hover {
+                color: var(--accent);
+            }
+
+        .breadcrumb i {
+            font-size: 0.65rem;
+        }
+
+    .detail-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4rem;
+        align-items: start;
+        margin-bottom: 4rem;
+    }
+
+    .detail-image {
+        position: sticky;
+        top: calc(var(--nav-height) + 32px + 1rem);
+    }
+
+    .main-image {
+        aspect-ratio: 1;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 6rem;
+        color: var(--border);
+    }
+
+        .main-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+    .detail-brand {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: var(--accent);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin-bottom: 0.5rem;
+    }
+
+    .detail-name {
+        font-family: var(--font-display);
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--text);
+        line-height: 1.2;
+        margin-bottom: 0.75rem;
+    }
+
+    .rating-summary {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+    }
+
+    .rating-stars {
+        display: flex;
+        gap: 0.15rem;
+    }
+
+        .rating-stars i {
+            font-size: 0.9rem;
+            color: #f4b942;
+        }
+
+            .rating-stars i.empty {
+                color: var(--border);
+            }
+
+    .rating-score {
+        font-family: var(--font-display);
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: var(--text);
+    }
+
+    .rating-count {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+    }
+
+    .detail-category {
+        display: inline-flex;
+        align-items: center;
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        color: var(--text-dim);
+        font-size: 0.75rem;
+        padding: 0.3rem 0.75rem;
+        border-radius: 20px;
+        margin-bottom: 1.5rem;
+    }
+
+    .detail-price-wrap {
+        display: flex;
+        align-items: baseline;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+        padding: 1.25rem;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+    }
+
+    .detail-price {
+        font-family: var(--font-display);
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--accent);
+    }
+
+    .detail-stock-badge {
+        font-size: 0.78rem;
+        font-weight: 600;
+        padding: 0.3rem 0.75rem;
+        border-radius: 20px;
+        margin-left: auto;
+    }
+
+        .detail-stock-badge.instock {
+            background: rgba(26,107,60,0.1);
+            color: var(--accent);
+            border: 1px solid rgba(26,107,60,0.2);
+        }
+
+        .detail-stock-badge.outstock {
+            background: rgba(231,76,60,0.1);
+            color: #e74c3c;
+            border: 1px solid rgba(231,76,60,0.2);
+        }
+
+    .detail-desc-title {
+        font-family: var(--font-display);
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--text-dim);
+        margin-bottom: 0.5rem;
+    }
+
+    .detail-description-wrap {
+        margin-bottom: 1.5rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .detail-description {
+        font-size: 0.9rem;
+        color: var(--text-dim);
+        line-height: 1.75;
+        margin: 0;
+    }
+
+    /* ── VARYANTLAR ── */
+    .variants-section {
+        margin-bottom: 1.25rem;
+    }
+
+    .variant-group {
+        margin-bottom: 1rem;
+    }
+
+    .variant-group-label {
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--text-dim);
+        margin-bottom: 0.6rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+        .variant-group-label span {
+            font-weight: 400;
+            color: var(--text);
+            text-transform: none;
+            letter-spacing: 0;
+            font-size: 0.82rem;
+        }
+
+    .variant-options {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .variant-btn {
+        padding: 0.45rem 0.9rem;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: var(--surface);
+        color: var(--text-dim);
+        font-family: var(--font-body);
+        font-size: 0.82rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.15s;
+        white-space: nowrap;
+    }
+
+        .variant-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .variant-btn.selected {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .variant-btn.out-of-stock {
+            opacity: 0.4;
+            cursor: not-allowed;
+            text-decoration: line-through;
+        }
+
+    .variant-warning {
+        font-size: 0.78rem;
+        color: #e74c3c;
+        margin-top: 0.4rem;
+        display: none;
+    }
+
+    .qty-section {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .qty-label {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--text-dim);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .qty-control {
+        display: flex;
+        align-items: center;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .qty-btn {
+        width: 36px;
+        height: 36px;
+        background: var(--surface2);
+        border: none;
+        color: var(--text);
+        font-size: 1rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s;
+    }
+
+        .qty-btn:hover {
+            background: var(--border);
+        }
+
+    .qty-display {
+        width: 48px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--text);
+        border-left: 1px solid var(--border);
+        border-right: 1px solid var(--border);
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .btn-add-cart-detail {
+        flex: 1;
+        background: var(--accent);
+        color: #fff;
+        border: none;
+        font-family: var(--font-display);
+        font-weight: 700;
+        font-size: 0.9rem;
+        padding: 0.9rem 1.5rem;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: opacity 0.2s, transform 0.1s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+        .btn-add-cart-detail:hover {
+            opacity: 0.88;
+            transform: translateY(-1px);
+        }
+
+        .btn-add-cart-detail:disabled {
+            background: var(--surface2);
+            color: var(--text-muted);
+            cursor: not-allowed;
+            transform: none;
+            opacity: 1;
+        }
+
+    .btn-fav-detail {
+        width: 50px;
+        height: 50px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        color: var(--text-muted);
+        cursor: pointer;
+        transition: color 0.2s, border-color 0.2s;
+        flex-shrink: 0;
+    }
+
+        .btn-fav-detail:hover {
+            color: #e74c3c;
+            border-color: #e74c3c;
+        }
+
+        .btn-fav-detail.active {
+            color: #e74c3c;
+            border-color: #e74c3c;
+        }
+
+    .detail-features {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+    }
+
+    .feature-item {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        font-size: 0.8rem;
+        color: var(--text-dim);
+        background: var(--surface);
+        border: 1px solid var(--border);
+        padding: 0.65rem 0.85rem;
+        border-radius: 8px;
+    }
+
+        .feature-item i {
+            color: var(--accent);
+            font-size: 0.85rem;
+            width: 16px;
+        }
+
+    .reviews-section {
+        border-top: 1px solid var(--border);
+        padding-top: 3rem;
+    }
+
+    .reviews-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 2rem;
+    }
+
+        .reviews-header h2 {
+            font-family: var(--font-display);
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+            .reviews-header h2 span {
+                font-size: 0.85rem;
+                font-weight: 400;
+                color: var(--text-muted);
+                margin-left: 0.5rem;
+            }
+
+    .rating-overview {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 2rem;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        align-items: center;
+    }
+
+    .rating-big {
+        text-align: center;
+        padding-right: 2rem;
+        border-right: 1px solid var(--border);
+    }
+
+        .rating-big .score {
+            font-family: var(--font-display);
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--text);
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .rating-big .stars {
+            display: flex;
+            justify-content: center;
+            gap: 0.2rem;
+            margin-bottom: 0.4rem;
+        }
+
+            .rating-big .stars i {
+                color: #f4b942;
+                font-size: 1rem;
+            }
+
+                .rating-big .stars i.empty {
+                    color: var(--border);
+                }
+
+        .rating-big .total {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+    .rating-bars {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .rating-bar-row {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-size: 0.78rem;
+        color: var(--text-dim);
+    }
+
+        .rating-bar-row .label {
+            width: 30px;
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+    .bar-track {
+        flex: 1;
+        height: 6px;
+        background: var(--surface2);
+        border-radius: 3px;
+        overflow: hidden;
+    }
+
+    .bar-fill {
+        height: 100%;
+        background: #f4b942;
+        border-radius: 3px;
+        transition: width 0.5s ease;
+    }
+
+    .rating-bar-row .pct {
+        width: 30px;
+        flex-shrink: 0;
+        color: var(--text-muted);
+    }
+
+    .write-review {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+        .write-review h3 {
+            font-family: var(--font-display);
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 1rem;
+        }
+
+    .star-picker {
+        display: flex;
+        gap: 0.35rem;
+        margin-bottom: 1rem;
+    }
+
+        .star-picker i {
+            font-size: 1.5rem;
+            color: var(--border);
+            cursor: pointer;
+            transition: color 0.15s;
+        }
+
+            .star-picker i.active {
+                color: #f4b942;
+            }
+
+            .star-picker i:hover {
+                color: #f4b942;
+            }
+
+    .review-textarea {
+        width: 100%;
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        color: var(--text);
+        font-family: var(--font-body);
+        font-size: 0.88rem;
+        font-weight: 300;
+        padding: 0.85rem 1rem;
+        border-radius: 8px;
+        outline: none;
+        resize: vertical;
+        min-height: 100px;
+        transition: border-color 0.2s;
+        margin-bottom: 0.75rem;
+    }
+
+        .review-textarea:focus {
+            border-color: var(--accent);
+        }
+
+        .review-textarea::placeholder {
+            color: var(--text-muted);
+        }
+
+    .btn-submit-review {
+        background: var(--accent);
+        color: #fff;
+        border: none;
+        font-family: var(--font-display);
+        font-weight: 700;
+        font-size: 0.82rem;
+        padding: 0.65rem 1.5rem;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: opacity 0.2s;
+    }
+
+        .btn-submit-review:hover {
+            opacity: 0.88;
+        }
+
+    .review-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .review-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1.25rem;
+    }
+
+    .review-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 0.75rem;
+    }
+
+    .reviewer-info {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .reviewer-avatar {
+        width: 36px;
+        height: 36px;
+        background: var(--accent);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--font-display);
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: #fff;
+        flex-shrink: 0;
+    }
+
+    .reviewer-name {
+        font-size: 0.88rem;
+        font-weight: 600;
+        color: var(--text);
+    }
+
+    .reviewer-date {
+        font-size: 0.72rem;
+        color: var(--text-muted);
+        margin-top: 0.1rem;
+    }
+
+    .review-stars {
+        display: flex;
+        gap: 0.15rem;
+    }
+
+        .review-stars i {
+            font-size: 0.75rem;
+            color: #f4b942;
+        }
+
+            .review-stars i.empty {
+                color: var(--border);
+            }
+
+    .review-comment {
+        font-size: 0.88rem;
+        color: var(--text-dim);
+        line-height: 1.65;
+    }
+
+    .btn-delete-review {
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        font-size: 0.75rem;
+        cursor: pointer;
+        transition: color 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+        padding: 0.3rem 0.5rem;
+        border-radius: 4px;
+    }
+
+        .btn-delete-review:hover {
+            color: #e74c3c;
+            background: rgba(231,76,60,0.08);
+        }
+
+    .no-reviews {
+        text-align: center;
+        padding: 3rem;
+        color: var(--text-muted);
+        font-size: 0.88rem;
+    }
+
+        .no-reviews i {
+            font-size: 2.5rem;
+            color: var(--border);
+            display: block;
+            margin-bottom: 0.75rem;
+        }
+
+    .detail-loading {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4rem;
+        animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    .skeleton-box {
+        background: var(--surface2);
+        border-radius: 16px;
+    }
+
+    .skeleton-line {
+        height: 12px;
+        background: var(--surface2);
+        border-radius: 4px;
+        margin-bottom: 0.75rem;
+    }
+
+        .skeleton-line.short {
+            width: 40%;
+        }
+
+        .skeleton-line.medium {
+            width: 65%;
+        }
+
+        .skeleton-line.long {
+            width: 90%;
+        }
+
+    @@keyframes pulse {
+        0%, 100% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0.6;
+        }
+    }
+</style>
+
+<div class="detail-page">
+    <div class="breadcrumb">
+        <a href="/Product"><i class="fas fa-house"></i> Ürünler</a>
+        <i class="fas fa-chevron-right"></i>
+        <span id="breadcrumbCategory">...</span>
+        <i class="fas fa-chevron-right"></i>
+        <span id="breadcrumbName">...</span>
+    </div>
+
+    <div id="detailContent">
+        <div class="detail-loading">
+            <div class="skeleton-box" style="aspect-ratio:1"></div>
+            <div style="padding-top:1rem">
+                <div class="skeleton-line short"></div>
+                <div class="skeleton-line medium" style="height:24px;margin-bottom:1rem"></div>
+                <div class="skeleton-line long"></div>
+                <div class="skeleton-line long"></div>
+                <div class="skeleton-line medium"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="reviews-section" id="reviewsSection" style="display:none">
+        <div class="reviews-header">
+            <h2>Değerlendirmeler <span id="reviewCountLabel"></span></h2>
+        </div>
+
+        <div class="rating-overview" id="ratingOverview"></div>
+
+        <div class="write-review" id="writeReview" style="display:none">
+            <h3>Değerlendirme Yaz</h3>
+            <div class="star-picker" id="starPicker">
+                <i class="far fa-star" onclick="setRating(1)" onmouseover="hoverRating(1)" onmouseout="resetHover()"></i>
+                <i class="far fa-star" onclick="setRating(2)" onmouseover="hoverRating(2)" onmouseout="resetHover()"></i>
+                <i class="far fa-star" onclick="setRating(3)" onmouseover="hoverRating(3)" onmouseout="resetHover()"></i>
+                <i class="far fa-star" onclick="setRating(4)" onmouseover="hoverRating(4)" onmouseout="resetHover()"></i>
+                <i class="far fa-star" onclick="setRating(5)" onmouseover="hoverRating(5)" onmouseout="resetHover()"></i>
+            </div>
+            <textarea class="review-textarea" id="reviewComment" placeholder="Ürün hakkında düşüncelerinizi paylaşın..."></textarea>
+            <button class="btn-submit-review" onclick="submitReview()">
+                <i class="fas fa-paper-plane"></i> Gönder
+            </button>
+        </div>
+
+        <div class="review-list" id="reviewList"></div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const token = '@Context.Session.GetString("Token")';
+        const currentUserId = '@Context.Session.GetString("UserId")';
+        let currentProduct = null;
+        let quantity = 1;
+        let selectedRating = 0;
+        let reviews = [];
+        let isFavorite = false;
+        let selectedVariants = {}; // { "Renk": "Siyah", "Numara": "42" }
+
+        const productId = window.location.pathname.split('/').pop();
+
+        const categoryIcons = {
+            'Elektronik': 'fa-mobile-screen',
+            'Giyim': 'fa-shirt',
+            'Spor': 'fa-dumbbell',
+            'Bakım & Kozmetik': 'fa-pump-soap',
+            'Ev & Yaşam': 'fa-couch',
+            'Kitap': 'fa-book',
+            'Evcil Hayvan': 'fa-paw'
+        };
+
+        async function loadProduct() {
+            try {
+                const res = await fetch(`https://localhost:7136/api/product/${productId}`);
+                if (!res.ok) throw new Error();
+                currentProduct = await res.json();
+
+                if (token) {
+                    try {
+                        const favRes = await fetch(`https://localhost:7136/api/favorites/${productId}/check`, {
+                            headers: { 'Authorization': 'Bearer ' + token }
+                        });
+                        if (favRes.ok) isFavorite = await favRes.json();
+                    } catch (e) {}
+                }
+
+                renderProduct(currentProduct);
+                await loadReviews();
+            } catch (e) {
+                document.getElementById('detailContent').innerHTML = `
+                    <div style="text-align:center;padding:4rem">
+                        <i class="fas fa-triangle-exclamation" style="font-size:3rem;color:var(--border);display:block;margin-bottom:1rem"></i>
+                        <h3 style="font-family:var(--font-display);color:var(--text-dim)">Ürün bulunamadı</h3>
+                        <a href="/Product" style="color:var(--accent)">← Ürünlere dön</a>
+                    </div>`;
+            }
+        }
+
+        function renderVariants(variants) {
+            if (!variants || variants.length === 0) return '';
+
+            // Gruplara ayır: { "Renk": [{id, value, stock}], "Numara": [...] }
+            const groups = {};
+            variants.forEach(v => {
+                if (!groups[v.name]) groups[v.name] = [];
+                groups[v.name].push(v);
+            });
+
+            return `
+                <div class="variants-section">
+                    ${Object.entries(groups).map(([groupName, options]) => `
+                        <div class="variant-group">
+                            <div class="variant-group-label">
+                                ${groupName}
+                                <span id="selected_${groupName.replace(/\s/g,'_')}"></span>
+                            </div>
+                            <div class="variant-options">
+                                ${options.map(opt => `
+                                    <button
+                                        class="variant-btn ${opt.stock === 0 ? 'out-of-stock' : ''}"
+                                        data-group="${groupName}"
+                                        data-value="${opt.value}"
+                                        data-stock="${opt.stock}"
+                                        data-price-modifier="${opt.priceModifier || 0}"
+                                        onclick="selectVariant(this)"
+                                        ${opt.stock === 0 ? 'disabled' : ''}
+                                    >
+                                        ${opt.value}
+                                    </button>
+                                `).join('')}
+                            </div>
+                            <div class="variant-warning" id="warning_${groupName.replace(/\s/g,'_')}">
+                                Lütfen ${groupName} seçin
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function selectVariant(btn) {
+            const group = btn.dataset.group;
+            const value = btn.dataset.value;
+            const priceModifier = parseFloat(btn.dataset.priceModifier) || 0;
+
+            // Aynı gruptaki tüm butonların seçimini kaldır
+            document.querySelectorAll(`.variant-btn[data-group="${group}"]`).forEach(b => {
+                b.classList.remove('selected');
+            });
+
+            // Bu butonu seç
+            btn.classList.add('selected');
+            selectedVariants[group] = value;
+
+            // Label güncelle
+            const labelSpan = document.getElementById(`selected_${group.replace(/\s/g,'_')}`);
+            if (labelSpan) labelSpan.textContent = `: ${value}`;
+
+            // Uyarıyı gizle
+            const warning = document.getElementById(`warning_${group.replace(/\s/g,'_')}`);
+            if (warning) warning.style.display = 'none';
+
+            // Fiyat modifier varsa güncelle
+            if (priceModifier !== 0) {
+                const basePrice = currentProduct.price;
+                const newPrice = basePrice + priceModifier;
+                const priceEl = document.getElementById('currentPrice');
+                if (priceEl) priceEl.textContent = newPrice.toLocaleString('tr-TR') + '₺';
+            }
+        }
+
+        function getVariantInfo() {
+            return Object.entries(selectedVariants)
+                .map(([k, v]) => `${k}: ${v}`)
+                .join(', ');
+        }
+
+        function validateVariants() {
+            if (!currentProduct.variants || currentProduct.variants.length === 0) return true;
+
+            const groups = {};
+            currentProduct.variants.forEach(v => { groups[v.name] = true; });
+
+            let valid = true;
+            Object.keys(groups).forEach(group => {
+                if (!selectedVariants[group]) {
+                    const warning = document.getElementById(`warning_${group.replace(/\s/g,'_')}`);
+                    if (warning) warning.style.display = 'block';
+                    valid = false;
+                }
+            });
+            return valid;
+        }
+
+        function renderProduct(p) {
+            document.getElementById('breadcrumbCategory').textContent = p.categoryName;
+            document.getElementById('breadcrumbName').textContent = p.name;
+            document.title = `${p.name} — Berkay Store`;
+
+            document.getElementById('detailContent').innerHTML = `
+                <div class="detail-grid">
+                    <div class="detail-image">
+                        <div class="main-image">
+                            ${p.imageUrl
+                                ? `<img src="${p.imageUrl}" alt="${p.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" /><i class="fas ${categoryIcons[p.categoryName] || 'fa-box'}" style="display:none"></i>`
+                                : `<i class="fas ${categoryIcons[p.categoryName] || 'fa-box'}"></i>`
+                            }
+                        </div>
+                    </div>
+
+                    <div class="detail-info">
+                        <div class="detail-brand">${p.brand || ''}</div>
+                        <h1 class="detail-name">${p.name}</h1>
+                        <div class="rating-summary" id="ratingSummary"></div>
+                        <div class="detail-category">${p.categoryName}</div>
+
+                        <div class="detail-price-wrap">
+                            <div class="detail-price" id="currentPrice">${p.price.toLocaleString('tr-TR')}₺</div>
+                            <span class="detail-stock-badge ${p.stock > 0 ? 'instock' : 'outstock'}">
+                                ${p.stock > 0 ? `<i class="fas fa-check"></i> Stokta ${p.stock} adet` : '<i class="fas fa-xmark"></i> Tükendi'}
+                            </span>
+                        </div>
+
+                        <div class="detail-description-wrap">
+                            <h3 class="detail-desc-title">Ürün Hakkında</h3>
+                            <p class="detail-description">${p.description}</p>
+                        </div>
+
+                        ${renderVariants(p.variants)}
+
+                        ${p.stock > 0 ? `
+                        <div class="qty-section">
+                            <span class="qty-label">Adet</span>
+                            <div class="qty-control">
+                                <button class="qty-btn" onclick="changeQty(-1)">−</button>
+                                <div class="qty-display" id="qtyDisplay">1</div>
+                                <button class="qty-btn" onclick="changeQty(1)">+</button>
+                            </div>
+                            <span style="font-size:0.78rem;color:var(--text-muted)">Maks. ${Math.min(p.stock, 10)} adet</span>
+                        </div>` : ''}
+
+                        <div class="action-buttons">
+                            <button class="btn-add-cart-detail" ${p.stock === 0 ? 'disabled' : ''} onclick="addToCart()">
+                                <i class="fas fa-bag-shopping"></i>
+                                ${p.stock === 0 ? 'Tükendi' : 'Sepete Ekle'}
+                            </button>
+                            <button class="btn-fav-detail ${isFavorite ? 'active' : ''}" id="favBtn" onclick="toggleFav()">
+                                <i class="${isFavorite ? 'fas' : 'far'} fa-heart"></i>
+                            </button>
+                        </div>
+
+                        <div class="detail-features">
+                            <div class="feature-item"><i class="fas fa-truck"></i><span>500₺ üzeri ücretsiz kargo</span></div>
+                            <div class="feature-item"><i class="fas fa-rotate-left"></i><span>30 gün iade garantisi</span></div>
+                            <div class="feature-item"><i class="fas fa-shield-halved"></i><span>Güvenli ödeme</span></div>
+                            <div class="feature-item"><i class="fas fa-headset"></i><span>7/24 müşteri desteği</span></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function addToCart() {
+            if (!token) { window.location.href = '/Auth/Login'; return; }
+            if (!currentProduct) return;
+
+            if (!validateVariants()) {
+                showToast('Lütfen tüm seçenekleri seçin!');
+                return;
+            }
+
+            const variantInfo = getVariantInfo();
+            const priceEl = document.getElementById('currentPrice');
+            const finalPrice = priceEl
+                ? parseFloat(priceEl.textContent.replace(/\./g,'').replace(',','.').replace('₺',''))
+                : currentProduct.price;
+
+            try {
+                const res = await fetch('https://localhost:7124/api/cart/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({
+                        productId: currentProduct.id,
+                        productName: currentProduct.name,
+                        unitPrice: finalPrice,
+                        quantity: quantity,
+                        variantInfo: variantInfo || null
+                    })
+                });
+
+                if (res.ok) {
+                    showToast(`${currentProduct.name} sepete eklendi!`);
+                    updateCartBadge();
+                }
+            } catch (e) { showToast('Bir hata oluştu.'); }
+        }
+
+        async function toggleFav() {
+            if (!token) { window.location.href = '/Auth/Login'; return; }
+            const btn = document.getElementById('favBtn');
+            const icon = btn.querySelector('i');
+            try {
+                if (isFavorite) {
+                    const res = await fetch(`https://localhost:7136/api/favorites/${productId}`, {
+                        method: 'DELETE',
+                        headers: { 'Authorization': 'Bearer ' + token }
+                    });
+                    if (res.ok) { isFavorite = false; btn.classList.remove('active'); icon.className = 'far fa-heart'; showToast('Favorilerden kaldırıldı.'); }
+                } else {
+                    const res = await fetch(`https://localhost:7136/api/favorites/${productId}`, {
+                        method: 'POST',
+                        headers: { 'Authorization': 'Bearer ' + token }
+                    });
+                    if (res.ok) { isFavorite = true; btn.classList.add('active'); icon.className = 'fas fa-heart'; showToast('Favorilere eklendi!'); }
+                }
+            } catch (e) { showToast('Bir hata oluştu.'); }
+        }
+
+        async function loadReviews() {
+            try {
+                const res = await fetch(`https://localhost:7136/api/product/${productId}/reviews`);
+                reviews = await res.json();
+                document.getElementById('reviewsSection').style.display = 'block';
+                if (token && token !== '') document.getElementById('writeReview').style.display = 'block';
+                renderReviews();
+            } catch (e) { console.log('reviews error:', e); }
+        }
+
+        function renderReviews() {
+            const count = reviews.length;
+            document.getElementById('reviewCountLabel').textContent = `(${count} değerlendirme)`;
+
+            const avg = count > 0 ? (reviews.reduce((s, r) => s + r.rating, 0) / count) : 0;
+            const avgFixed = avg.toFixed(1);
+
+            const summaryEl = document.getElementById('ratingSummary');
+            if (summaryEl) {
+                summaryEl.innerHTML = `
+                    <div class="rating-stars">${renderStars(avg)}</div>
+                    <span class="rating-score">${avgFixed}</span>
+                    <span class="rating-count">(${count} değerlendirme)</span>
+                `;
+            }
+
+            const counts = [0,0,0,0,0];
+            reviews.forEach(r => counts[r.rating - 1]++);
+
+            document.getElementById('ratingOverview').innerHTML = `
+                <div class="rating-big">
+                    <div class="score">${avgFixed}</div>
+                    <div class="stars">${renderStars(avg)}</div>
+                    <div class="total">${count} değerlendirme</div>
+                </div>
+                <div class="rating-bars">
+                    ${[5,4,3,2,1].map(star => `
+                        <div class="rating-bar-row">
+                            <span class="label">${star} <i class="fas fa-star" style="color:#f4b942;font-size:0.65rem"></i></span>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width:${count > 0 ? (counts[star-1]/count*100) : 0}%"></div>
+                            </div>
+                            <span class="pct">${count > 0 ? Math.round(counts[star-1]/count*100) : 0}%</span>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+
+            if (count === 0) {
+                document.getElementById('reviewList').innerHTML = `
+                    <div class="no-reviews">
+                        <i class="fas fa-comment-slash"></i>
+                        Henüz değerlendirme yok. İlk değerlendirmeyi siz yapın!
+                    </div>`;
+                return;
+            }
+
+            document.getElementById('reviewList').innerHTML = reviews.map(r => `
+                <div class="review-card" id="review_${r.id}">
+                    <div class="review-card-header">
+                        <div class="reviewer-info">
+                            <div class="reviewer-avatar">${r.userFullName.charAt(0).toUpperCase()}</div>
+                            <div>
+                                <div class="reviewer-name">${r.userFullName}</div>
+                                <div class="reviewer-date">${new Date(r.createdAt).toLocaleDateString('tr-TR', {day:'numeric', month:'long', year:'numeric'})}</div>
+                            </div>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:0.75rem">
+                            <div class="review-stars">${renderStars(r.rating)}</div>
+                            ${r.userId.toString() === currentUserId ? `
+                            <button class="btn-delete-review" onclick="deleteReview('${r.id}')">
+                                <i class="fas fa-trash-can"></i> Sil
+                            </button>` : ''}
+                        </div>
+                    </div>
+                    <p class="review-comment">${r.comment}</p>
+                </div>
+            `).join('');
+        }
+
+        function renderStars(rating) {
+            return [1,2,3,4,5].map(i =>
+                `<i class="fas fa-star${i <= Math.round(rating) ? '' : ' empty'}"></i>`
+            ).join('');
+        }
+
+        function setRating(val) { selectedRating = val; updateStarPicker(val); }
+        function hoverRating(val) { updateStarPicker(val); }
+        function resetHover() { updateStarPicker(selectedRating); }
+
+        function updateStarPicker(val) {
+            document.querySelectorAll('#starPicker i').forEach((star, idx) => {
+                star.className = idx < val ? 'fas fa-star active' : 'far fa-star';
+            });
+        }
+
+        async function submitReview() {
+            if (!token) { window.location.href = '/Auth/Login'; return; }
+            if (selectedRating === 0) { showToast('Lütfen puan seçin!'); return; }
+            const comment = document.getElementById('reviewComment').value.trim();
+            if (!comment) { showToast('Lütfen yorum yazın!'); return; }
+            try {
+                const res = await fetch(`https://localhost:7136/api/product/${productId}/reviews`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                    body: JSON.stringify({ comment, rating: selectedRating })
+                });
+                if (res.ok) {
+                    showToast('Değerlendirmeniz eklendi!');
+                    document.getElementById('reviewComment').value = '';
+                    selectedRating = 0;
+                    updateStarPicker(0);
+                    await loadReviews();
+                } else {
+                    const err = await res.text();
+                    showToast(err || 'Bir hata oluştu.');
+                }
+            } catch (e) { showToast('Bağlantı hatası.'); }
+        }
+
+        async function deleteReview(reviewId) {
+            try {
+                const res = await fetch(`https://localhost:7136/api/product/${productId}/reviews/${reviewId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (res.ok) { showToast('Yorum silindi.'); await loadReviews(); }
+            } catch (e) { showToast('Bir hata oluştu.'); }
+        }
+
+        function changeQty(delta) {
+            if (!currentProduct) return;
+            const max = Math.min(currentProduct.stock, 10);
+            quantity = Math.max(1, Math.min(max, quantity + delta));
+            document.getElementById('qtyDisplay').textContent = quantity;
+        }
+
+        async function updateCartBadge() {
+            if (!token) return;
+            try {
+                const res = await fetch('https://localhost:7124/api/cart', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                const cart = await res.json();
+                const total = cart.items?.reduce((s, i) => s + i.quantity, 0) || 0;
+                document.getElementById('cartCount').textContent = total;
+            } catch (e) {}
+        }
+
+        loadProduct();
+        updateCartBadge();
+    </script>
+}

@@ -1,0 +1,580 @@
+﻿
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .orders-page {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .orders-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid var(--border);
+    }
+
+        .orders-header h1 {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+            .orders-header h1 span {
+                font-size: 0.9rem;
+                font-weight: 400;
+                color: var(--text-muted);
+                margin-left: 0.5rem;
+            }
+
+    /* ── ORDER CARD ── */
+    .order-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 1rem;
+        transition: box-shadow 0.2s;
+    }
+
+        .order-card:hover {
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        }
+
+    .order-card-header {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 1rem;
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid var(--border);
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+        .order-card-header:hover {
+            background: var(--surface2);
+        }
+
+    .order-meta {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .order-meta-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.15rem;
+    }
+
+        .order-meta-item .label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        .order-meta-item .value {
+            font-size: 0.88rem;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+            .order-meta-item .value.price {
+                font-family: var(--font-display);
+                font-weight: 700;
+                color: var(--accent);
+            }
+
+    .order-status {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 0.3rem 0.75rem;
+        border-radius: 20px;
+        letter-spacing: 0.03em;
+    }
+
+        .status-badge.pending {
+            background: rgba(255,193,7,0.12);
+            color: #e6ac00;
+            border: 1px solid rgba(255,193,7,0.25);
+        }
+
+        .status-badge.confirmed {
+            background: rgba(26,107,60,0.1);
+            color: var(--accent);
+            border: 1px solid rgba(26,107,60,0.2);
+        }
+
+        .status-badge.shipped {
+            background: rgba(58,134,255,0.1);
+            color: #3a86ff;
+            border: 1px solid rgba(58,134,255,0.2);
+        }
+
+        .status-badge.delivered {
+            background: rgba(26,107,60,0.1);
+            color: var(--accent);
+            border: 1px solid rgba(26,107,60,0.2);
+        }
+
+        .status-badge.cancelled {
+            background: rgba(231,76,60,0.1);
+            color: #e74c3c;
+            border: 1px solid rgba(231,76,60,0.2);
+        }
+
+    .order-toggle {
+        color: var(--text-muted);
+        font-size: 0.8rem;
+        transition: transform 0.2s;
+    }
+
+        .order-toggle.open {
+            transform: rotate(180deg);
+        }
+
+    /* ── ORDER ITEMS ── */
+    .order-items {
+        display: none;
+        padding: 1.25rem 1.5rem;
+    }
+
+        .order-items.open {
+            display: block;
+        }
+
+    .order-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid var(--border);
+    }
+
+        .order-item:last-child {
+            border-bottom: none;
+        }
+
+    .order-item-img {
+        width: 48px;
+        height: 48px;
+        background: var(--surface2);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        color: var(--border);
+        flex-shrink: 0;
+    }
+
+    .order-item-info {
+        flex: 1;
+    }
+
+        .order-item-info h4 {
+            font-size: 0.88rem;
+            font-weight: 500;
+            color: var(--text);
+            margin-bottom: 0.2rem;
+        }
+
+        .order-item-info p {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+
+    .order-item-price {
+        font-family: var(--font-display);
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: var(--text);
+        text-align: right;
+    }
+
+        .order-item-price span {
+            display: block;
+            font-size: 0.72rem;
+            font-weight: 400;
+            color: var(--text-muted);
+        }
+
+    /* ── ORDER FOOTER ── */
+    .order-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem 1.5rem;
+        background: var(--surface2);
+        border-top: 1px solid var(--border);
+    }
+
+    .order-address {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+
+        .order-address i {
+            color: var(--accent);
+        }
+
+    .order-total-row {
+        font-family: var(--font-display);
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: var(--accent);
+    }
+
+    /* ── PROGRESS BAR ── */
+    .order-progress {
+        padding: 1.25rem 1.5rem;
+        border-top: 1px solid var(--border);
+    }
+
+    .progress-steps {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: relative;
+    }
+
+        .progress-steps::before {
+            content: '';
+            position: absolute;
+            top: 12px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--border);
+            z-index: 0;
+        }
+
+    .progress-line {
+        position: absolute;
+        top: 12px;
+        left: 0;
+        height: 2px;
+        background: var(--accent);
+        z-index: 1;
+        transition: width 0.5s ease;
+    }
+
+    .progress-step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        z-index: 2;
+    }
+
+    .step-dot {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: var(--surface2);
+        border: 2px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.65rem;
+        color: var(--text-muted);
+        transition: background 0.3s, border-color 0.3s;
+    }
+
+        .step-dot.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+        }
+
+        .step-dot.done {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+        }
+
+    .step-label {
+        font-size: 0.68rem;
+        color: var(--text-muted);
+        text-align: center;
+        white-space: nowrap;
+    }
+
+        .step-label.active {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+    /* ── EMPTY ── */
+    .empty-orders {
+        text-align: center;
+        padding: 5rem 2rem;
+    }
+
+        .empty-orders i {
+            font-size: 3.5rem;
+            color: var(--border);
+            margin-bottom: 1.5rem;
+            display: block;
+        }
+
+        .empty-orders h2 {
+            font-family: var(--font-display);
+            font-size: 1.2rem;
+            color: var(--text-dim);
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-orders p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+        }
+
+    .btn-shop {
+        background: var(--accent);
+        color: #fff;
+        text-decoration: none;
+        font-family: var(--font-display);
+        font-weight: 700;
+        font-size: 0.85rem;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        transition: opacity 0.2s;
+        display: inline-block;
+    }
+
+        .btn-shop:hover {
+            opacity: 0.88;
+        }
+
+    /* ── LOADING ── */
+    .skeleton-order {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1.25rem 1.5rem;
+        margin-bottom: 1rem;
+        animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    .skeleton-line {
+        height: 10px;
+        background: var(--surface2);
+        border-radius: 4px;
+        margin-bottom: 0.5rem;
+    }
+
+        .skeleton-line.short {
+            width: 40%;
+        }
+
+        .skeleton-line.medium {
+            width: 65%;
+        }
+
+    @@keyframes pulse {
+        0%, 100% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0.6;
+        }
+    }
+</style>
+
+<div class="orders-page">
+    <div class="orders-header">
+        <h1>Siparişlerim <span id="orderCount"></span></h1>
+    </div>
+
+    <div id="ordersContent">
+        <!-- Skeleton -->
+        @for (int i = 0; i < 3; i++)
+        {
+            <div class="skeleton-order">
+                <div class="skeleton-line medium"></div>
+                <div class="skeleton-line short"></div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const token = '@Context.Session.GetString("Token")';
+
+        const statusMap = {
+            0: { label: 'Beklemede', class: 'pending', icon: 'fa-clock', step: 0 },
+            1: { label: 'Onaylandı', class: 'confirmed', icon: 'fa-check', step: 1 },
+            2: { label: 'Kargoda', class: 'shipped', icon: 'fa-truck', step: 2 },
+            3: { label: 'Teslim Edildi', class: 'delivered', icon: 'fa-box-open', step: 3 },
+            4: { label: 'İptal Edildi', class: 'cancelled', icon: 'fa-xmark', step: -1 }
+        };
+
+        const steps = ['Sipariş Alındı', 'Onaylandı', 'Kargoya Verildi', 'Teslim Edildi'];
+
+        async function loadOrders() {
+            if (!token) {
+                document.getElementById('ordersContent').innerHTML = `
+                    <div class="empty-orders">
+                        <i class="fas fa-box"></i>
+                        <h2>Giriş yapmanız gerekiyor</h2>
+                        <p>Siparişlerinizi görmek için giriş yapın.</p>
+                        <a href="/Auth/Login" class="btn-shop">Giriş Yap</a>
+                    </div>`;
+                return;
+            }
+
+            try {
+                const res = await fetch('https://localhost:7124/api/order', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                const orders = await res.json();
+
+                if (!orders || orders.length === 0) {
+                    document.getElementById('ordersContent').innerHTML = `
+                        <div class="empty-orders">
+                            <i class="fas fa-box-open"></i>
+                            <h2>Henüz siparişiniz yok</h2>
+                            <p>İlk siparişinizi vermek için alışverişe başlayın.</p>
+                            <a href="/Product" class="btn-shop">Alışverişe Başla</a>
+                        </div>`;
+                    return;
+                }
+
+                document.getElementById('orderCount').textContent = `(${orders.length} sipariş)`;
+                renderOrders(orders);
+
+            } catch (e) {
+                document.getElementById('ordersContent').innerHTML = `
+                    <div class="empty-orders">
+                        <i class="fas fa-triangle-exclamation"></i>
+                        <h2>Siparişler yüklenemedi</h2>
+                        <p>Lütfen tekrar deneyin.</p>
+                    </div>`;
+            }
+        }
+
+        function renderOrders(orders) {
+            document.getElementById('ordersContent').innerHTML = orders.map((order, idx) => {
+                const status = statusMap[order.status] || statusMap[0];
+                const date = new Date(order.createdAt).toLocaleDateString('tr-TR', {
+                    day: 'numeric', month: 'long', year: 'numeric'
+                });
+                const stepIndex = status.step;
+                const progressWidth = stepIndex < 0 ? 0 : (stepIndex / (steps.length - 1)) * 100;
+
+                return `
+                    <div class="order-card">
+                        <div class="order-card-header" onclick="toggleOrder('${order.id}', this)">
+                            <div class="order-meta">
+                                <div class="order-meta-item">
+                                    <span class="label">Sipariş No</span>
+                                    <span class="value">#${order.id.slice(0, 8).toUpperCase()}</span>
+                                </div>
+                                <div class="order-meta-item">
+                                    <span class="label">Tarih</span>
+                                    <span class="value">${date}</span>
+                                </div>
+                                <div class="order-meta-item">
+                                    <span class="label">Ürün Sayısı</span>
+                                    <span class="value">${order.items.length} ürün</span>
+                                </div>
+                                <div class="order-meta-item">
+                                    <span class="label">Toplam</span>
+                                    <span class="value price">${order.totalAmount.toLocaleString('tr-TR')}₺</span>
+                                </div>
+                            </div>
+                            <div class="order-status">
+                                <span class="status-badge ${status.class}">
+                                    <i class="fas ${status.icon}"></i>
+                                    ${status.label}
+                                </span>
+                                <i class="fas fa-chevron-down order-toggle" id="toggle_${order.id}"></i>
+                            </div>
+                        </div>
+
+                        <div class="order-items" id="items_${order.id}">
+                            <!-- Progress -->
+                            ${stepIndex >= 0 ? `
+                            <div class="order-progress">
+                                <div class="progress-steps">
+                                    <div class="progress-line" style="width: ${progressWidth}%"></div>
+                                    ${steps.map((step, i) => `
+                                        <div class="progress-step">
+                                            <div class="step-dot ${i < stepIndex ? 'done' : i === stepIndex ? 'active' : ''}">
+                                                ${i <= stepIndex ? '<i class="fas fa-check"></i>' : (i + 1)}
+                                            </div>
+                                            <span class="step-label ${i === stepIndex ? 'active' : ''}">${step}</span>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>` : ''}
+
+                            <!-- Items -->
+                            ${order.items.map(item => `
+                                <div class="order-item">
+                                    <div class="order-item-img">
+                                        <i class="fas fa-box"></i>
+                                    </div>
+                                    <div class="order-item-info">
+                                        <h4>${item.productName}</h4>
+                                        <p>${item.quantity} adet × ${item.unitPrice.toLocaleString('tr-TR')}₺</p>
+                                    </div>
+                                    <div class="order-item-price">
+                                        ${(item.unitPrice * item.quantity).toLocaleString('tr-TR')}₺
+                                        <span>${item.quantity} adet</span>
+                                    </div>
+                                </div>
+                            `).join('')}
+
+                            <div class="order-footer">
+                                <div class="order-address">
+                                    <i class="fas fa-location-dot"></i>
+                                    ${order.address}
+                                </div>
+                                <div class="order-total-row">
+                                    Toplam: ${order.totalAmount.toLocaleString('tr-TR')}₺
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function toggleOrder(id, header) {
+            const items = document.getElementById(`items_${id}`);
+            const toggle = document.getElementById(`toggle_${id}`);
+            items.classList.toggle('open');
+            toggle.classList.toggle('open');
+        }
+
+        loadOrders();
+    </script>
+}
+

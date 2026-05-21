@@ -1,0 +1,43 @@
+[
+  {
+    "Name": "Yeni Profil",
+    "Projects": [
+      {
+        "Path": "ProductApi\\ProductApi.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "UserApi\\UserApi.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "SmartCommerce.UI\\SmartCommerce.UI.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "OrderApi\\OrderApi.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "NotificationWorker\\NotificationWorker.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "StockWorker\\StockWorker.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "InvoiceWorker\\InvoiceWorker.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "CargoWorker\\CargoWorker.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "PaymentWorker\\PaymentWorker.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]

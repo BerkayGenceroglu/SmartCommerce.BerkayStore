@@ -1,0 +1,595 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] — Berkay Store</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <style>
+        :root {
+            --bg: #f7f7f5;
+            --surface: #ffffff;
+            --surface2: #efefed;
+            --border: #e2e2de;
+            --accent: #1a6b3c;
+            --accent2: #3a86ff;
+            --text: #111111;
+            --text-muted: #888888;
+            --text-dim: #555555;
+            --font-display: 'Syne', sans-serif;
+            --font-body: 'DM Sans', sans-serif;
+            --nav-height: 64px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font-body);
+            font-weight: 300;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ── NAVBAR ── */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--nav-height);
+            background: rgba(247,247,245,0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            padding: 0 2rem;
+            gap: 2rem;
+        }
+
+        .nav-logo {
+            font-family: var(--font-display);
+            font-weight: 800;
+            font-size: 1.4rem;
+            letter-spacing: -0.02em;
+            color: var(--text);
+            text-decoration: none;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+            .nav-logo span {
+                color: var(--accent);
+            }
+
+        .nav-search {
+            flex: 1;
+            max-width: 480px;
+            position: relative;
+        }
+
+            .nav-search input {
+                width: 100%;
+                background: var(--surface2);
+                border: 1px solid var(--border);
+                color: var(--text);
+                font-family: var(--font-body);
+                font-size: 0.875rem;
+                font-weight: 300;
+                padding: 0.55rem 1rem 0.55rem 2.5rem;
+                border-radius: 6px;
+                outline: none;
+                transition: border-color 0.2s;
+            }
+
+                .nav-search input::placeholder {
+                    color: var(--text-muted);
+                }
+
+                .nav-search input:focus {
+                    border-color: var(--accent);
+                }
+
+            .nav-search i {
+                position: absolute;
+                left: 0.85rem;
+                top: 50%;
+                transform: translateY(-50%);
+                color: var(--text-muted);
+                font-size: 0.8rem;
+            }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            margin-left: auto;
+        }
+
+        .nav-link {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 400;
+            padding: 0.45rem 0.85rem;
+            border-radius: 6px;
+            transition: color 0.2s, background 0.2s;
+            white-space: nowrap;
+        }
+
+            .nav-link:hover {
+                color: var(--text);
+                background: var(--surface2);
+            }
+
+            .nav-link.active {
+                color: var(--accent);
+            }
+
+        .nav-cart {
+            position: relative;
+            color: var(--text-dim);
+            text-decoration: none;
+            padding: 0.45rem 0.85rem;
+            border-radius: 6px;
+            transition: color 0.2s, background 0.2s;
+            font-size: 1rem;
+        }
+
+            .nav-cart:hover {
+                color: var(--text);
+                background: var(--surface2);
+            }
+
+        .cart-badge {
+            position: absolute;
+            top: 2px;
+            right: 4px;
+            background: var(--accent);
+            color: #fff;
+            font-size: 0.6rem;
+            font-weight: 700;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-btn {
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 0.8rem;
+            letter-spacing: 0.05em;
+            padding: 0.5rem 1.1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: opacity 0.2s, transform 0.1s;
+            white-space: nowrap;
+        }
+
+            .nav-btn:hover {
+                opacity: 0.88;
+                transform: translateY(-1px);
+            }
+
+            .nav-btn:active {
+                transform: translateY(0);
+            }
+
+        .nav-btn-outline {
+            background: transparent;
+            color: var(--text-dim);
+            border: 1px solid var(--border);
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: 0.8rem;
+            letter-spacing: 0.05em;
+            padding: 0.5rem 1.1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: border-color 0.2s, color 0.2s;
+            white-space: nowrap;
+        }
+
+            .nav-btn-outline:hover {
+                border-color: var(--text-dim);
+                color: var(--text);
+            }
+
+        .nav-divider {
+            width: 1px;
+            height: 20px;
+            background: var(--border);
+            flex-shrink: 0;
+        }
+
+        /* ── TICKER ── */
+        .ticker {
+            position: fixed;
+            top: var(--nav-height);
+            left: 0;
+            right: 0;
+            height: 32px;
+            background: var(--accent);
+            overflow: hidden;
+            z-index: 999;
+            display: flex;
+            align-items: center;
+        }
+
+        .ticker-track {
+            display: flex;
+            gap: 4rem;
+            animation: ticker 30s linear infinite;
+            white-space: nowrap;
+        }
+
+        .ticker-item {
+            font-family: var(--font-display);
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .ticker-sep {
+            color: rgba(255,255,255,0.4);
+        }
+
+        @@keyframes ticker {
+            from {
+                transform: translateX(0);
+            }
+
+            to {
+                transform: translateX(-50%);
+            }
+        }
+
+        /* ── MAIN CONTENT ── */
+        .main-wrapper {
+            margin-top: calc(var(--nav-height) + 32px);
+            min-height: calc(100vh - var(--nav-height) - 32px);
+        }
+
+        /* ── CATEGORY BAR ── */
+        .category-bar {
+            border-bottom: 1px solid var(--border);
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0;
+            overflow-x: auto;
+            scrollbar-width: none;
+            background: var(--surface);
+        }
+
+            .category-bar::-webkit-scrollbar {
+                display: none;
+            }
+
+        .cat-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 400;
+            padding: 0.85rem 1.2rem;
+            border-bottom: 2px solid transparent;
+            transition: color 0.2s, border-color 0.2s;
+            white-space: nowrap;
+        }
+
+            .cat-link:hover {
+                color: var(--text);
+            }
+
+            .cat-link.active {
+                color: var(--accent);
+                border-bottom-color: var(--accent);
+            }
+
+        /* ── FOOTER ── */
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 3rem 2rem 2rem;
+            margin-top: 6rem;
+            background: var(--surface);
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 3rem;
+            max-width: 1400px;
+            margin: 0 auto 3rem;
+        }
+
+        .footer-brand .logo {
+            font-family: var(--font-display);
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: var(--text);
+            margin-bottom: 0.75rem;
+        }
+
+            .footer-brand .logo span {
+                color: var(--accent);
+            }
+
+        .footer-brand p {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            line-height: 1.7;
+            max-width: 280px;
+        }
+
+        .footer-col h4 {
+            font-family: var(--font-display);
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            margin-bottom: 1rem;
+        }
+
+        .footer-col a {
+            display: block;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+            transition: color 0.2s;
+        }
+
+            .footer-col a:hover {
+                color: var(--accent);
+            }
+
+        .footer-bottom {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+        }
+
+            .footer-bottom p {
+                color: var(--text-muted);
+                font-size: 0.78rem;
+            }
+
+                .footer-bottom p span {
+                    color: var(--accent);
+                }
+
+        .footer-socials {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+            .footer-socials a {
+                width: 32px;
+                height: 32px;
+                border: 1px solid var(--border);
+                border-radius: 6px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: var(--text-muted);
+                text-decoration: none;
+                font-size: 0.8rem;
+                transition: border-color 0.2s, color 0.2s;
+            }
+
+                .footer-socials a:hover {
+                    border-color: var(--accent);
+                    color: var(--accent);
+                }
+
+        /* ── TOAST ── */
+        .toast-container {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .toast {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--accent);
+            color: var(--text);
+            font-size: 0.85rem;
+            padding: 0.85rem 1.25rem;
+            border-radius: 8px;
+            animation: toastIn 0.3s ease;
+            max-width: 320px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        @@keyframes toastIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ── SCROLLBAR ── */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 2px;
+        }
+
+            ::-webkit-scrollbar-thumb:hover {
+                background: var(--text-muted);
+            }
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <a href="/" class="nav-logo">
+            Berkay Store<span></span>
+        </a>
+
+        <div class="nav-search">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Ürün, kategori veya marka ara..." id="globalSearch" />
+        </div>
+
+        <div class="nav-links">
+            <a href="/Product" class="nav-link">Ürünler</a>
+            <a href="/Order" class="nav-link">Siparişlerim</a>
+            <a href="/Favorite" class="nav-link">Favorilerim</a>  
+
+            <div class="nav-divider"></div>
+
+            <a href="/Cart" class="nav-cart">
+                <i class="fas fa-bag-shopping"></i>
+                <span class="cart-badge" id="cartCount">0</span>
+            </a>
+
+            @if (Context.Session.GetString("Token") != null)
+            {
+                <span class="nav-link" style="color: var(--text-dim); font-size:0.78rem;">
+                    <i class="fas fa-circle" style="color:var(--accent);font-size:0.5rem;vertical-align:middle;"></i>
+                    @Context.Session.GetString("UserName")
+                </span>
+                <a href="/Auth/Logout" class="nav-btn-outline">Çıkış</a>
+            }
+            else
+            {
+                <a href="/Auth/Login" class="nav-btn-outline">Giriş</a>
+                <a href="/Auth/Register" class="nav-btn">Üye Ol</a>
+            }
+        </div>
+    </nav>
+
+    <!-- TICKER -->
+    <div class="ticker">
+        <div class="ticker-track">
+            <span class="ticker-item"><i class="fas fa-truck"></i> 500₺ üzeri ücretsiz kargo <span class="ticker-sep"></span></span>
+            <span class="ticker-item"><i class="fas fa-shield-halved"></i> Güvenli ödeme <span class="ticker-sep"></span></span>
+            <span class="ticker-item"><i class="fas fa-rotate-left"></i> 30 gün iade garantisi <span class="ticker-sep"></span></span>
+            <span class="ticker-item"><i class="fas fa-headset"></i> 7/24 destek <span class="ticker-sep">✦</span></span>
+            <span class="ticker-item"><i class="fas fa-truck"></i> 500₺ üzeri ücretsiz kargo <span class="ticker-sep"></span></span>
+            <span class="ticker-item"><i class="fas fa-shield-halved"></i> Güvenli ödeme <span class="ticker-sep"></span></span>
+            <span class="ticker-item"><i class="fas fa-rotate-left"></i> 30 gün iade garantisi <span class="ticker-sep"></span></span>
+            <span class="ticker-item"><i class="fas fa-headset"></i> 7/24 destek <span class="ticker-sep"></span></span>
+        </div>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main-wrapper">
+        @RenderBody()
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <div class="logo">Berkay Store<span>.</span></div>
+                <p>Modern alışverişin yeni adresi. Binlerce ürün, güvenli ödeme ve hızlı teslimat.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Keşfet</h4>
+                <a href="/Product">Tüm Ürünler</a>
+                <a href="/Product?category=elektronik">Elektronik</a>
+                <a href="/Product?category=giyim">Giyim</a>
+                <a href="/Product?category=spor">Spor</a>
+            </div>
+            <div class="footer-col">
+                <h4>Hesabım</h4>
+                <a href="/Auth/Login">Giriş Yap</a>
+                <a href="/Auth/Register">Üye Ol</a>
+                <a href="/Order" class="nav-link">Siparişlerim</a>
+                <a href="/Favorite" class="nav-link">Favorilerim</a>  
+                <a href="/Cart">Sepetim</a>
+            </div>
+            <div class="footer-col">
+                <h4>Destek</h4>
+                <a href="#">Yardım Merkezi</a>
+                <a href="#">İade & Değişim</a>
+                <a href="#">Kargo Takibi</a>
+                <a href="#">İletişim</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2026 <span>Berkay Store</span>. Tüm hakları saklıdır.</p>
+            <div class="footer-socials">
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-linkedin"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- TOAST CONTAINER -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        function showToast(msg) {
+            const t = document.createElement('div');
+            t.className = 'toast';
+            t.textContent = msg;
+            document.getElementById('toastContainer').appendChild(t);
+            setTimeout(() => t.remove(), 3500);
+        }
+
+        document.getElementById('globalSearch').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && this.value.trim()) {
+                window.location.href = '/Product?search=' + encodeURIComponent(this.value.trim());
+            }
+        });
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
