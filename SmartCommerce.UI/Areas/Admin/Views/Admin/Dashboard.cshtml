@@ -1,0 +1,859 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <script>
+        const adminToken = sessionStorage.getItem('adminToken');
+        if (!adminToken) window.location.href = '/Admin/Login';
+
+        const categoryData = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.CategoryStats));
+
+        window.addEventListener('load', () => {
+            const ctx = document.getElementById('categoryPie').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: categoryData.map(c => c.Category),
+                    datasets: [{
+                        data: categoryData.map(c => c.Count),
+                        backgroundColor: ['#427AB5','#38a169','#d69e2e','#805ad5','#ed8936','#e53e3e','#38b2ac'],
+                        borderWidth: 2,
+                        borderColor: '#ffffff',
+                        hoverOffset: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '65%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { padding: 12, font: { size: 11, family: 'Segoe UI' }, color: '#4a5568', usePointStyle: true, pointStyleWidth: 8 }
+                        },
+                        tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.parsed} ürün` } }
+                    }
+                }
+            });
+        });
+    </script>
+}
+
+<style>
+    .page-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        margin-bottom: 2rem;
+    }
+
+    .page-title {
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: var(--text);
+        letter-spacing: -0.01em;
+    }
+
+    .page-sub {
+        font-size: 0.82rem;
+        color: var(--text-muted);
+        margin-top: 0.3rem;
+    }
+
+    .date-badge {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 0.5rem 1rem;
+        font-size: 0.82rem;
+        color: var(--text-dim);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        box-shadow: var(--shadow);
+    }
+
+    /* ── TOP METRICS ── */
+    .metrics-row {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.25rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .metric-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 1.5rem;
+        box-shadow: var(--shadow);
+        position: relative;
+        overflow: hidden;
+        transition: box-shadow 0.2s, transform 0.2s;
+    }
+
+        .metric-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            border-radius: 14px 14px 0 0;
+        }
+
+        .metric-card.blue::before {
+            background: linear-gradient(90deg, #427AB5, #6fa3d8);
+        }
+
+        .metric-card.green::before {
+            background: linear-gradient(90deg, #38a169, #68d391);
+        }
+
+        .metric-card.yellow::before {
+            background: linear-gradient(90deg, #d69e2e, #f6e05e);
+        }
+
+        .metric-card.purple::before {
+            background: linear-gradient(90deg, #805ad5, #b794f4);
+        }
+
+    .metric-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1.25rem;
+    }
+
+    .metric-label {
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--text-muted);
+    }
+
+    .metric-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+    }
+
+    .metric-card.blue .metric-icon {
+        background: rgba(66,122,181,0.1);
+        color: #427AB5;
+    }
+
+    .metric-card.green .metric-icon {
+        background: rgba(56,161,105,0.1);
+        color: #38a169;
+    }
+
+    .metric-card.yellow .metric-icon {
+        background: rgba(214,158,46,0.1);
+        color: #d69e2e;
+    }
+
+    .metric-card.purple .metric-icon {
+        background: rgba(128,90,213,0.1);
+        color: #805ad5;
+    }
+
+    .metric-value {
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: var(--text);
+        line-height: 1;
+        margin-bottom: 0.4rem;
+        letter-spacing: -0.02em;
+    }
+
+    .metric-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-top: 0.9rem;
+        margin-top: 0.9rem;
+        border-top: 1px dashed var(--border);
+    }
+
+    .metric-today-label {
+        font-size: 0.7rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .metric-today-value {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: var(--text);
+    }
+
+    /* ── SECONDARY ── */
+    .secondary-row {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.25rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .secondary-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 1.1rem 1.25rem;
+        box-shadow: var(--shadow);
+        display: flex;
+        align-items: center;
+        gap: 0.9rem;
+        transition: box-shadow 0.2s, transform 0.2s;
+    }
+
+        .secondary-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-1px);
+        }
+
+    .secondary-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        flex-shrink: 0;
+    }
+
+    .si-green {
+        background: rgba(56,161,105,0.1);
+        color: #38a169;
+    }
+
+    .si-orange {
+        background: rgba(237,137,54,0.1);
+        color: #ed8936;
+    }
+
+    .si-red {
+        background: rgba(229,62,62,0.1);
+        color: #e53e3e;
+    }
+
+    .si-blue {
+        background: rgba(66,122,181,0.1);
+        color: #427AB5;
+    }
+
+    .si-teal {
+        background: rgba(56,178,172,0.1);
+        color: #38b2ac;
+    }
+
+    .secondary-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .secondary-value {
+        font-size: 1.35rem;
+        font-weight: 800;
+        color: var(--text);
+        line-height: 1;
+        margin-bottom: 0.15rem;
+    }
+
+    .secondary-label {
+        font-size: 0.7rem;
+        color: var(--text-muted);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .secondary-desc {
+        font-size: 0.7rem;
+        color: var(--text-muted);
+        margin-top: 0.2rem;
+    }
+
+    /* ── BOTTOM GRID ── */
+    .bottom-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.25rem;
+    }
+
+    .bottom-grid-right {
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+    }
+
+    /* ── CARD ── */
+    .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+    }
+
+    .card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid var(--border);
+        background: var(--surface2);
+    }
+
+    .card-title {
+        font-size: 0.88rem;
+        font-weight: 700;
+        color: var(--text);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+        .card-title i {
+            color: var(--accent);
+        }
+
+    .card-link {
+        font-size: 0.72rem;
+        color: var(--accent);
+        text-decoration: none;
+        font-weight: 600;
+        padding: 0.3rem 0.65rem;
+        background: var(--accent-bg);
+        border-radius: 6px;
+        transition: background 0.15s;
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+    }
+
+        .card-link:hover {
+            background: rgba(66,122,181,0.15);
+        }
+
+    /* ── ORDER TABLE ── */
+    .order-row {
+        display: grid;
+        grid-template-columns: 1.8fr 1.2fr 0.9fr 1fr;
+        align-items: center;
+        padding: 0.85rem 1.25rem;
+        border-bottom: 1px solid var(--border);
+        transition: background 0.15s;
+        font-size: 0.82rem;
+    }
+
+        .order-row:last-child {
+            border-bottom: none;
+        }
+
+        .order-row:hover {
+            background: #fafbff;
+        }
+
+        .order-row.th {
+            background: var(--surface2);
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            padding: 0.6rem 1.25rem;
+        }
+
+    .order-id-cell {
+        font-weight: 700;
+        color: var(--text);
+        font-family: monospace;
+        font-size: 0.8rem;
+    }
+
+    .order-date-cell {
+        color: var(--text-muted);
+        font-size: 0.75rem;
+    }
+
+    .order-amount-cell {
+        font-weight: 700;
+        color: var(--accent);
+        font-size: 0.85rem;
+    }
+
+    /* ── PIE ── */
+    .pie-wrap {
+        padding: 1rem 1.25rem;
+        height: 260px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* ── TOP CATEGORY BANNER ── */
+    .top-cat-banner {
+        background: linear-gradient(135deg, #427AB5 0%, #2d5a8e 100%);
+        border-radius: 12px;
+        padding: 1rem 1.25rem;
+        margin: 1rem 1.25rem 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 4px 15px rgba(66,122,181,0.2);
+    }
+
+    .top-cat-label {
+        font-size: 0.62rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: rgba(255,255,255,0.6);
+        margin-bottom: 0.2rem;
+    }
+
+    .top-cat-name {
+        font-size: 1rem;
+        font-weight: 800;
+        color: #fff;
+    }
+
+    .top-cat-count {
+        font-size: 0.72rem;
+        color: rgba(255,255,255,0.65);
+        margin-top: 0.1rem;
+    }
+
+    .top-cat-icon {
+        font-size: 1.8rem;
+        color: rgba(255,255,255,0.2);
+    }
+
+    /* ── KRITIK STOK ── */
+    .tp-row {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.8rem 1.25rem;
+        border-bottom: 1px solid var(--border);
+        transition: background 0.15s;
+    }
+
+        .tp-row:last-child {
+            border-bottom: none;
+        }
+
+        .tp-row:hover {
+            background: #fafbff;
+        }
+
+    .tp-rank {
+        width: 24px;
+        height: 24px;
+        border-radius: 6px;
+        background: var(--accent-bg);
+        color: var(--accent);
+        font-size: 0.7rem;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .tp-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .tp-name {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--text);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .tp-cat {
+        font-size: 0.68rem;
+        color: var(--text-muted);
+    }
+
+    .tp-right {
+        text-align: right;
+        flex-shrink: 0;
+    }
+
+    .tp-stock {
+        font-size: 0.78rem;
+        font-weight: 700;
+    }
+
+        .tp-stock.low {
+            color: #ed8936;
+        }
+
+        .tp-stock.critical {
+            color: #e53e3e;
+        }
+
+    .tp-price {
+        font-size: 0.68rem;
+        color: var(--text-muted);
+    }
+
+    /* ── EN ÇOK SİPARİŞ ── */
+    .tor-row {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.8rem 1.25rem;
+        border-bottom: 1px solid var(--border);
+        transition: background 0.15s;
+    }
+
+        .tor-row:last-child {
+            border-bottom: none;
+        }
+
+        .tor-row:hover {
+            background: #fafbff;
+        }
+
+    .tor-rank {
+        width: 24px;
+        height: 24px;
+        border-radius: 6px;
+        font-size: 0.7rem;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+        .tor-rank.r1 {
+            background: rgba(214,158,46,0.15);
+            color: #d69e2e;
+        }
+
+        .tor-rank.r2 {
+            background: rgba(113,128,150,0.1);
+            color: #718096;
+        }
+
+        .tor-rank.r3 {
+            background: rgba(205,116,78,0.12);
+            color: #cd743e;
+        }
+
+        .tor-rank.rn {
+            background: var(--accent-bg);
+            color: var(--accent);
+        }
+
+    .tor-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .tor-name {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--text);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .tor-bar-wrap {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 0.2rem;
+    }
+
+    .tor-bar {
+        flex: 1;
+        height: 4px;
+        background: #edf2f7;
+        border-radius: 99px;
+        overflow: hidden;
+    }
+
+    .tor-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #427AB5, #6fa3d8);
+        border-radius: 99px;
+    }
+
+    .tor-qty {
+        font-size: 0.68rem;
+        color: var(--text-muted);
+        white-space: nowrap;
+    }
+
+    .tor-right {
+        text-align: right;
+        flex-shrink: 0;
+    }
+
+    .tor-revenue {
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: var(--accent);
+    }
+
+    .tor-unit {
+        font-size: 0.68rem;
+        color: var(--text-muted);
+    }
+
+    .clr-green {
+        color: #38a169 !important;
+    }
+
+    .clr-orange {
+        color: #ed8936 !important;
+    }
+
+    .clr-red {
+        color: #e53e3e !important;
+    }
+</style>
+
+<!-- HEADER -->
+<div class="page-header">
+    <div>
+        <div class="page-title">Dashboard</div>
+        <div class="page-sub">Mağazanızın anlık durumuna genel bakış</div>
+    </div>
+    <div class="date-badge">
+        <i class="fas fa-calendar-days"></i>
+        @DateTime.Now.ToString("dd MMMM yyyy, dddd", new System.Globalization.CultureInfo("tr-TR"))
+    </div>
+</div>
+
+<!-- TOP 4 METRICS -->
+<div class="metrics-row">
+    <div class="metric-card blue">
+        <div class="metric-top">
+            <div class="metric-label">Toplam Sipariş</div>
+            <div class="metric-icon"><i class="fas fa-shopping-bag"></i></div>
+        </div>
+        <div class="metric-value">@ViewBag.TotalOrders</div>
+        <div class="metric-footer">
+            <div class="metric-today-label">Bugün</div>
+            <div class="metric-today-value">@ViewBag.OrdersToday sipariş</div>
+        </div>
+    </div>
+
+    <div class="metric-card green">
+        <div class="metric-top">
+            <div class="metric-label">Toplam Gelir</div>
+            <div class="metric-icon"><i class="fas fa-turkish-lira-sign"></i></div>
+        </div>
+        <div class="metric-value">@(((decimal)ViewBag.TotalRevenue).ToString("N0"))₺</div>
+        <div class="metric-footer">
+            <div class="metric-today-label">Bugün</div>
+            <div class="metric-today-value">@(((decimal)ViewBag.RevenueToday).ToString("N0"))₺</div>
+        </div>
+    </div>
+
+    <div class="metric-card yellow">
+        <div class="metric-top">
+            <div class="metric-label">Toplam Ürün</div>
+            <div class="metric-icon"><i class="fas fa-box-open"></i></div>
+        </div>
+        <div class="metric-value">@ViewBag.TotalProducts</div>
+        <div class="metric-footer">
+            <div class="metric-today-label">Aktif</div>
+            <div class="metric-today-value clr-green">@ViewBag.ActiveProducts ürün</div>
+        </div>
+    </div>
+
+    <div class="metric-card purple">
+        <div class="metric-top">
+            <div class="metric-label">Kullanıcılar</div>
+            <div class="metric-icon"><i class="fas fa-users"></i></div>
+        </div>
+        <div class="metric-value">@ViewBag.TotalUsers</div>
+        <div class="metric-footer">
+            <div class="metric-today-label">Bu Ay Yeni</div>
+            <div class="metric-today-value">@ViewBag.NewUsersThisMonth kullanıcı</div>
+        </div>
+    </div>
+</div>
+
+<!-- SECONDARY 4 CARDS -->
+<div class="secondary-row">
+    <div class="secondary-card">
+        <div class="secondary-icon si-green"><i class="fas fa-circle-check"></i></div>
+        <div class="secondary-info">
+            <div class="secondary-value clr-green">@ViewBag.ActiveProducts</div>
+            <div class="secondary-label">Aktif Ürün</div>
+            <div class="secondary-desc">Satışta olan ürünler</div>
+        </div>
+    </div>
+    <div class="secondary-card">
+        <div class="secondary-icon si-orange"><i class="fas fa-triangle-exclamation"></i></div>
+        <div class="secondary-info">
+            <div class="secondary-value clr-orange">@ViewBag.LowStock</div>
+            <div class="secondary-label">Kritik Stok</div>
+            <div class="secondary-desc">5 veya altı stokta kalan</div>
+        </div>
+    </div>
+    <div class="secondary-card">
+        <div class="secondary-icon si-red"><i class="fas fa-ban"></i></div>
+        <div class="secondary-info">
+            <div class="secondary-value clr-red">@ViewBag.OutOfStock</div>
+            <div class="secondary-label">Tükenen Ürün</div>
+            <div class="secondary-desc">Stok sıfır olan ürünler</div>
+        </div>
+    </div>
+    <div class="secondary-card">
+        <div class="secondary-icon si-teal"><i class="fas fa-truck"></i></div>
+        <div class="secondary-info">
+            <div class="secondary-value">@ViewBag.TotalCargos</div>
+            <div class="secondary-label">Toplam Kargo</div>
+            <div class="secondary-desc">@ViewBag.AdminCount admin hesabı</div>
+        </div>
+    </div>
+</div>
+
+<!-- BOTTOM 2x2 GRID -->
+<div class="bottom-grid">
+
+    <!-- SOL ÜST: SON SİPARİŞLER -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title"> Son Siparişler</div>
+            <a href="/Admin/Orders" class="card-link">Tümünü Gör <i class="fas fa-arrow-right" style="font-size:0.6rem"></i></a>
+        </div>
+        <div class="order-row th">
+            <span>Sipariş No</span><span>Tarih</span><span>Durum</span><span>Tutar</span>
+        </div>
+        @if (ViewBag.RecentOrders != null)
+        {
+            foreach (var order in ViewBag.RecentOrders)
+            {
+                <div class="order-row">
+                    <div class="order-id-cell">#@order.Id.ToString().Substring(0, 8).ToUpper()</div>
+                    <div class="order-date-cell">@order.CreatedAt.ToString("dd MMM, HH:mm", new System.Globalization.CultureInfo("tr-TR"))</div>
+                    <div>
+                        <span class="badge @(order.Status == 1 ? "badge-green" : order.Status == 2 ? "badge-red" : "badge-yellow")">
+                            @(order.Status == 0 ? "Bekliyor" : order.Status == 1 ? "Tamamlandı" : "İptal")
+                        </span>
+                    </div>
+                    <div class="order-amount-cell">@order.TotalAmount.ToString("N0")₺</div>
+                </div>
+            }
+        }
+    </div>
+
+    <!-- SOL ALT: EN ÇOK SİPARİŞ EDİLEN -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title"> En Çok Sipariş Edilen</div>
+            <a href="/Admin/Orders" class="card-link">Siparişler <i class="fas fa-arrow-right" style="font-size:0.6rem"></i></a>
+        </div>
+        @if (ViewBag.TopOrderedProducts != null)
+        {
+            int maxQty = 0;
+            foreach (var p in ViewBag.TopOrderedProducts) { if (p.TotalQuantity > maxQty) maxQty = p.TotalQuantity; }
+            int rank = 1;
+            foreach (var p in ViewBag.TopOrderedProducts)
+            {
+                int pct = maxQty > 0 ? (int)((p.TotalQuantity / (double)maxQty) * 100) : 0;
+                string rankClass = rank == 1 ? "r1" : rank == 2 ? "r2" : rank == 3 ? "r3" : "rn";
+                <div class="tor-row">
+                    <div class="tor-rank @rankClass">@rank</div>
+                    <div class="tor-info">
+                        <div class="tor-name">@p.ProductName</div>
+                        <div class="tor-bar-wrap">
+                            <div class="tor-bar"><div class="tor-bar-fill" style="width:@pct%"></div></div>
+                            <span class="tor-qty">@p.TotalQuantity adet</span>
+                        </div>
+                    </div>
+                    <div class="tor-right">
+                        <div class="tor-revenue">@p.TotalRevenue.ToString("N0")₺</div>
+                        <div class="tor-unit">toplam gelir</div>
+                    </div>
+                </div>
+                rank++;
+            }
+        }
+        else
+        {
+            <div style="padding:2rem;text-align:center;color:var(--text-muted);font-size:0.85rem">
+                <i class="fas fa-box-open" style="font-size:1.5rem;display:block;margin-bottom:0.5rem;color:var(--border)"></i>
+                Henüz sipariş yok
+            </div>
+        }
+    </div>
+
+    <!-- SAĞ ÜST: KATEGORİ PIE -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">Kategori Dağılımı</div>
+        </div>
+        <div class="top-cat-banner">
+            <div>
+                <div class="top-cat-label">En Fazla Ürün Bulunan Kategori</div>
+                <div class="top-cat-name">@ViewBag.TopCategory</div>
+                <div class="top-cat-count">@ViewBag.TopCategoryCount ürün</div>
+            </div>
+            <i class="fas fa-trophy top-cat-icon"></i>
+        </div>
+        <div class="pie-wrap">
+            <canvas id="categoryPie"></canvas>
+        </div>
+    </div>
+
+    <!-- SAĞ ALT: KRİTİK STOK -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">Kritik Stok Ürünler</div>
+            <a href="/Admin/Products" class="card-link">Ürünler <i class="fas fa-arrow-right" style="font-size:0.6rem"></i></a>
+        </div>
+        @if (ViewBag.TopProducts != null)
+        {
+            int rank = 1;
+            foreach (var p in ViewBag.TopProducts)
+            {
+                <div class="tp-row">
+                    <div class="tp-rank">@rank</div>
+                    <div class="tp-info">
+                        <div class="tp-name">@p.Name</div>
+                        <div class="tp-cat">@p.Brand · @p.CategoryName</div>
+                    </div>
+                    <div class="tp-right">
+                        <div class="tp-stock @(p.Stock == 0 ? "critical" : "low")">
+                            @(p.Stock == 0 ? "Tükendi" : $"{p.Stock} adet")
+                        </div>
+                        <div class="tp-price">@p.Price.ToString("N0")₺</div>
+                    </div>
+                </div>
+                rank++;
+            }
+        }
+    </div>
+</div>

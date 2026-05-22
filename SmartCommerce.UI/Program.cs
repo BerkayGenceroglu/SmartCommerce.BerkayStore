@@ -1,3 +1,7 @@
+using Microsoft.EntityFrameworkCore;
+using SmartCommerce.UI.Areas.Admin.Abstract;
+using SmartCommerce.UI.Areas.Admin.Context;
+using SmartCommerce.UI.Areas.Admin.Services;
 using SmartCommerce.UI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,6 +17,16 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
+//Context
+builder.Services.AddDbContext<AdminDbContext>(opt =>
+    opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped<IAdminProductService, AdminProductService>();
+builder.Services.AddScoped<ICargoService, CargoService>();
+builder.Services.AddScoped<IAdminOrderService, AdminOrderService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ICouponService, CouponService>();
+
 
 // HttpClient
 builder.Services.AddHttpClient();
@@ -32,9 +46,13 @@ app.UseRouting();
 app.UseSession();
 app.UseAuthorization();
 
+app.MapControllerRoute(
+    name: "areas",
+    pattern: "{area:exists}/{controller=Admin}/{action=Login}/{id?}");
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Default}/{action=Index}/{id?}");
+
 
 app.Run();

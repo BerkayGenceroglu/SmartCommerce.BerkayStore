@@ -1,0 +1,440 @@
+﻿@{
+    ViewData["Title"] = "Admin Girişi";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Girişi — Berkay Store</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --accent: #427AB5;
+            --accent-dark: #2d5a8e;
+            --accent-light: #6fa3d8;
+            --font: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            font-family: var(--font);
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 1fr 480px;
+        }
+
+        /* ── SOL TARAF - ARKA PLAN ── */
+        .login-left {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-left-bg {
+            position: absolute;
+            inset: 0;
+            background-image: url('https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1200&auto=format&fit=crop&q=80');
+            background-size: cover;
+            background-position: center;
+            filter: brightness(0.45);
+        }
+
+        .login-left-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(66,122,181,0.7) 0%, rgba(20,40,80,0.85) 100%);
+        }
+
+        .login-left-content {
+            position: relative;
+            z-index: 1;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 4rem;
+        }
+
+        .left-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: rgba(255,255,255,0.9);
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            margin-bottom: 2rem;
+            width: fit-content;
+        }
+
+        .left-title {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 800;
+            color: #fff;
+            line-height: 1.1;
+            margin-bottom: 1rem;
+            letter-spacing: -0.02em;
+        }
+
+            .left-title span {
+                color: #a8ccf0;
+            }
+
+        .left-sub {
+            font-size: 1rem;
+            color: rgba(255,255,255,0.65);
+            line-height: 1.6;
+            max-width: 380px;
+            margin-bottom: 3rem;
+        }
+
+        .left-stats {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .left-stat {
+            text-align: left;
+        }
+
+        .left-stat-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #fff;
+            line-height: 1;
+            margin-bottom: 0.2rem;
+        }
+
+        .left-stat-label {
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.55);
+        }
+
+        /* ── SAĞ TARAF - FORM ── */
+        .login-right {
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem 2.5rem;
+        }
+
+        .login-form-wrap {
+            width: 100%;
+            max-width: 360px;
+        }
+
+        .login-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .logo-icon {
+            width: 44px;
+            height: 44px;
+            background: var(--accent);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            color: #fff;
+        }
+
+        .logo-name {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #1a1a2e;
+        }
+
+        .logo-sub {
+            font-size: 0.7rem;
+            color: #999;
+        }
+
+        .form-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #1a1a2e;
+            margin-bottom: 0.35rem;
+        }
+
+        .form-subtitle {
+            font-size: 0.85rem;
+            color: #888;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.1rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #555;
+            margin-bottom: 0.45rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .input-wrap {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 0.9rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #bbb;
+            font-size: 0.85rem;
+            pointer-events: none;
+        }
+
+        .form-input {
+            width: 100%;
+            background: #f8f9fc;
+            border: 1.5px solid #e8eaf0;
+            border-radius: 10px;
+            color: #1a1a2e;
+            font-family: var(--font);
+            font-size: 0.9rem;
+            padding: 0.75rem 0.9rem 0.75rem 2.5rem;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+            .form-input:focus {
+                border-color: var(--accent);
+                background: #fff;
+                box-shadow: 0 0 0 3px rgba(66,122,181,0.1);
+            }
+
+            .form-input::placeholder {
+                color: #ccc;
+            }
+
+        .error-msg {
+            background: #fff5f5;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            color: #dc2626;
+            font-size: 0.82rem;
+            padding: 0.7rem 1rem;
+            margin-bottom: 1rem;
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+            .error-msg.show {
+                display: flex;
+            }
+
+        .btn-login {
+            width: 100%;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-family: var(--font);
+            font-weight: 700;
+            font-size: 0.92rem;
+            padding: 0.9rem;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+        }
+
+            .btn-login:hover {
+                background: var(--accent-dark);
+                transform: translateY(-1px);
+            }
+
+            .btn-login:disabled {
+                opacity: 0.6;
+                cursor: not-allowed;
+                transform: none;
+            }
+
+        .login-footer {
+            margin-top: 1.5rem;
+            text-align: center;
+            font-size: 0.78rem;
+            color: #aaa;
+        }
+
+            .login-footer a {
+                color: var(--accent);
+                text-decoration: none;
+                font-weight: 600;
+            }
+
+                .login-footer a:hover {
+                    text-decoration: underline;
+                }
+
+        @@media (max-width: 768px) {
+            body {
+                grid-template-columns: 1fr;
+            }
+
+            .login-left {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- SOL - VİZÜEL -->
+    <div class="login-left">
+        <div class="login-left-bg"></div>
+        <div class="login-left-overlay"></div>
+        <div class="login-left-content">
+            <div class="left-badge"><i class="fas fa-shield-halved"></i> Güvenli Yönetim Paneli</div>
+            <h1 class="left-title">Berkay Store<br><span>Yönetim Merkezi</span></h1>
+            <p class="left-sub">Ürünlerinizi, siparişlerinizi ve müşterilerinizi tek bir yerden yönetin.</p>
+            <div class="left-stats">
+                <div class="left-stat">
+                    <div class="left-stat-value">200+</div>
+                    <div class="left-stat-label">Ürün</div>
+                </div>
+                <div class="left-stat">
+                    <div class="left-stat-value">7</div>
+                    <div class="left-stat-label">Kategori</div>
+                </div>
+                <div class="left-stat">
+                    <div class="left-stat-value">24/7</div>
+                    <div class="left-stat-label">Erişim</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SAĞ - FORM -->
+    <div class="login-right">
+        <div class="login-form-wrap">
+            <div class="login-logo">
+                <div class="logo-icon"><i class="fas fa-store"></i></div>
+                <div>
+                    <div class="logo-name">Berkay Store</div>
+                    <div class="logo-sub">Admin Panel</div>
+                </div>
+            </div>
+
+            <h2 class="form-title">Hoş Geldiniz</h2>
+            <p class="form-subtitle">Admin hesabınızla giriş yapın</p>
+
+            <div class="error-msg" id="errorMsg">
+                <i class="fas fa-circle-exclamation"></i>
+                <span id="errorText">Geçersiz e-posta veya şifre.</span>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">E-posta</label>
+                <div class="input-wrap">
+                    <i class="fas fa-envelope input-icon"></i>
+                    <input type="email" class="form-input" id="email" placeholder="admin@berkaystore.com" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Şifre</label>
+                <div class="input-wrap">
+                    <i class="fas fa-lock input-icon"></i>
+                    <input type="password" class="form-input" id="password" placeholder="••••••••" />
+                </div>
+            </div>
+
+            <button class="btn-login" id="loginBtn" onclick="doLogin()">
+                <i class="fas fa-right-to-bracket"></i> Giriş Yap
+            </button>
+
+            <div class="login-footer">
+                <a href="/">Mağazaya Dön</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+        async function doLogin() {
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const btn = document.getElementById('loginBtn');
+            const errorMsg = document.getElementById('errorMsg');
+            const errorText = document.getElementById('errorText');
+
+            if (!email || !password) {
+                errorText.textContent = 'Lütfen tüm alanları doldurun.';
+                errorMsg.classList.add('show');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Giriş yapılıyor...';
+            errorMsg.classList.remove('show');
+
+            try {
+                const res = await fetch('https://localhost:7038/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    const payload = JSON.parse(atob(data.token.split('.')[1]));
+                    const role = payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
+
+                    if (role !== 'Admin') {
+                        errorText.textContent = 'Bu hesabın admin yetkisi yok.';
+                        errorMsg.classList.add('show');
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fas fa-right-to-bracket"></i> Giriş Yap';
+                        return;
+                    }
+
+                    sessionStorage.setItem('adminToken', data.token);
+                    sessionStorage.setItem('adminName', data.fullName);
+
+                    btn.innerHTML = '<i class="fas fa-check"></i> Yönlendiriliyor...';
+                    btn.style.background = '#27ae60';
+                    setTimeout(() => window.location.href = '/Admin/Admin/Dashboard', 800);
+                } else {
+                    errorText.textContent = 'Geçersiz e-posta veya şifre.';
+                    errorMsg.classList.add('show');
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-right-to-bracket"></i> Giriş Yap';
+                }
+            } catch (e) {
+                errorText.textContent = 'Bağlantı hatası. API çalışıyor mu?';
+                errorMsg.classList.add('show');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-right-to-bracket"></i> Giriş Yap';
+            }
+        }
+    </script>
+</body>
+</html>
