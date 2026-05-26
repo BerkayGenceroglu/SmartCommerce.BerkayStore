@@ -1,4 +1,4 @@
-<img width="1870" height="913" alt="image" src="https://github.com/user-attachments/assets/30312b1a-9623-456e-a48e-5bbe3409a123" /><h1 align="center">🛒 SmartCommerce.BerkayStore</h1>
+<h1 align="center">🛒 SmartCommerce.BerkayStore</h1>
 
 <p align="center">
   <b>Modern Mikroservis E-Ticaret Platformu</b><br/>
