@@ -463,11 +463,13 @@ Visual Studio → **Multiple Startup Projects** ayarla:
 
 <!-- LOGIN -->
 **Giriş Yap**
-> 📷 _Buraya login sayfası ekran görüntüsü ekle_
+<img width="1861" height="953" alt="image" src="https://github.com/user-attachments/assets/15726062-0138-4653-aaba-1e741ebcbc23" />
+
 
 <!-- REGISTER -->
 **Kayıt Ol**
-> 📷 _Buraya register sayfası ekran görüntüsü ekle_
+<img width="1868" height="955" alt="image" src="https://github.com/user-attachments/assets/b36e8379-7dd5-471a-97be-c38f5cc0f61c" />
+
 
 </details>
 
@@ -478,14 +480,26 @@ Visual Studio → **Multiple Startup Projects** ayarla:
 <details>
 <summary>Ana Sayfa</summary>
 
-> 📷 _Buraya ana sayfa (hero banner, öne çıkan ürünler, kategoriler) ekran görüntüsü ekle_
+<img width="1868" height="954" alt="image" src="https://github.com/user-attachments/assets/9f0ba8ab-5492-4c0e-a98c-ab493f4d15c9" />
+<img width="1859" height="875" alt="image" src="https://github.com/user-attachments/assets/d1718b53-6949-4429-a942-2a71d5e53a2c" />
+<img width="1865" height="957" alt="image" src="https://github.com/user-attachments/assets/4f431e71-17b8-406c-9371-2f8b6d25070b" />
+<img width="1866" height="958" alt="image" src="https://github.com/user-attachments/assets/a248c8ee-330d-4f62-bff2-c06012ba0483" />
+<img width="1866" height="955" alt="image" src="https://github.com/user-attachments/assets/27a72bc8-0bbf-48f3-9670-32afb104cc69" />
+<img width="1871" height="955" alt="image" src="https://github.com/user-attachments/assets/ea372f26-15cd-4a4d-8bf6-0035101936a1" />
+<img width="1852" height="695" alt="image" src="https://github.com/user-attachments/assets/d8b99be1-dd6e-4b76-ae23-ed92d338ac5b" />
 
 </details>
 
 <details>
 <summary>Ürün Listeleme & Arama</summary>
 
-> 📷 _Buraya ürün listesi ve kategori filtresi ekran görüntüsü ekle_
+<img width="1854" height="953" alt="image" src="https://github.com/user-attachments/assets/5b562dc5-6355-441b-b1bc-c5905690eeb7" />
+<img width="1865" height="961" alt="image" src="https://github.com/user-attachments/assets/f52d7ba3-6232-4f73-a449-e05404a710c5" />
+<img width="1865" height="956" alt="image" src="https://github.com/user-attachments/assets/064045ad-3238-43f1-848e-afc2e4c0ae88" />
+<img width="1869" height="952" alt="image" src="https://github.com/user-attachments/assets/d5ecb7c3-6a9b-4722-bc2e-cf90ad3edfbb" />
+<img width="1864" height="955" alt="image" src="https://github.com/user-attachments/assets/7ae42e1d-57a7-46f7-85fc-9fe250690792" />
+<img width="1866" height="959" alt="image" src="https://github.com/user-attachments/assets/90897b0a-1cb1-4df4-82f4-abff0e10bedb" />
+
 
 </details>
 
