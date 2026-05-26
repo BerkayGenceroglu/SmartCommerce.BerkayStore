@@ -223,36 +223,24 @@ POST /api/auth/login  →  Email + şifre
 
 ### Kimlik Doğrulama
 
-<details>
-<summary><b>Giriş Yap</b> — JWT token tabanlı, rol kontrolü ile admin/kullanıcı ayrımı</summary>
-
-<br>
+#### Giriş Yap
+> JWT token tabanlı, rol kontrolü ile admin/kullanıcı ayrımı yapılır.
 
 <img width="1861" height="953" alt="Giriş Sayfası" src="https://github.com/user-attachments/assets/15726062-0138-4653-aaba-1e741ebcbc23" />
 
-> Kullanıcı e-posta ve şifresiyle giriş yapar. JWT token üretilir, session'a kaydedilir. Admin rolündeki kullanıcılar `/Admin` paneline yönlendirilir.
+---
 
-</details>
-
-<details>
-<summary><b>Kayıt Ol</b> — Zorunlu ve opsiyonel alanlarla zengin kayıt formu</summary>
-
-<br>
+#### Kayıt Ol
+> Ad soyad, e-posta ve şifre zorunludur. Telefon, cinsiyet ve şehir opsiyonel olarak alınır.
 
 <img width="1868" height="955" alt="Kayıt Sayfası" src="https://github.com/user-attachments/assets/b36e8379-7dd5-471a-97be-c38f5cc0f61c" />
-
-> Ad soyad, e-posta ve şifre zorunludur. Telefon, cinsiyet ve şehir bilgileri opsiyonel olarak alınır. Şifre BCrypt ile hashlenerek veritabanına kaydedilir.
-
-</details>
 
 ---
 
 ### Kullanıcı Arayüzü
 
-<details>
-<summary><b>Ana Sayfa</b> — Hero banner, kategori grid, kampanya alanları</summary>
-
-<br>
+#### Ana Sayfa
+> Canlı kayan bilgi bandı, hero alanı, kategori kartları ve öne çıkan ürün bölümlerinden oluşur. Navbar'daki arama kutusu Elasticsearch'e bağlıdır.
 
 <img width="1868" height="954" alt="Ana Sayfa 1" src="https://github.com/user-attachments/assets/9f0ba8ab-5492-4c0e-a98c-ab493f4d15c9" />
 <img width="1859" height="875" alt="Ana Sayfa 2" src="https://github.com/user-attachments/assets/d1718b53-6949-4429-a942-2a71d5e53a2c" />
@@ -263,14 +251,10 @@ POST /api/auth/login  →  Email + şifre
 <img width="1852" height="695" alt="Ana Sayfa Footer" src="https://github.com/user-attachments/assets/d8b99be1-dd6e-4b76-ae23-ed92d338ac5b" />
 <img width="1869" height="953" alt="Ana Sayfa 8" src="https://github.com/user-attachments/assets/02043083-aa78-480e-bbea-efd0b69f3f78" />
 
-> Ana sayfa; canlı kayan bilgi bandı, hero alanı, kategori kartları ve öne çıkan ürün bölümlerinden oluşur. Navbar'daki arama kutusu Elasticsearch'e bağlıdır.
+---
 
-</details>
-
-<details>
-<summary><b>Ürün Listesi & Arama</b> — Çok kriterli filtreleme, sıralama, Elasticsearch arama</summary>
-
-<br>
+#### Ürün Listesi & Arama
+> Sol sidebar'dan kategori, marka, fiyat ve stok filtresi uygulanır. Uygulanan filtreler etiket olarak gösterilir ve tek tıkla kaldırılabilir.
 
 <img width="1854" height="953" alt="Ürün Listesi 1" src="https://github.com/user-attachments/assets/5b562dc5-6355-441b-b1bc-c5905690eeb7" />
 <img width="1865" height="961" alt="Ürün Listesi 2" src="https://github.com/user-attachments/assets/f52d7ba3-6232-4f73-a449-e05404a710c5" />
@@ -281,51 +265,35 @@ POST /api/auth/login  →  Email + şifre
 <img width="1865" height="950" alt="Ürün Listesi 7" src="https://github.com/user-attachments/assets/9f9194ff-f26e-441c-9ad2-b7966ede77d9" />
 <img width="1868" height="950" alt="Ürün Listesi 8" src="https://github.com/user-attachments/assets/8e5dc473-aaae-4b4c-8f89-bbe1e665205e" />
 
-> Sol sidebar'dan kategori, marka, fiyat aralığı ve stok durumuna göre filtreleme yapılabilir. Sıralama seçenekleri: Önerilen, Fiyat (Artan/Azalan), İsim (A-Z). Uygulanan filtreler etiket olarak görüntülenir ve tek tıkla kaldırılabilir.
+---
 
-</details>
-
-<details>
-<summary><b>Ürün Detay</b> — Varyant seçici, fiyat hesaplama, stok durumu</summary>
-
-<br>
+#### Ürün Detay
+> Varyantlar (renk, beden, numara, kapasite vb.) dinamik butonlarla seçilir. Seçime göre fiyat farkı (PriceModifier) anlık güncellenir.
 
 <img width="1874" height="962" alt="Ürün Detay 1" src="https://github.com/user-attachments/assets/699e2480-9689-4313-b561-7b47bb22edc8" />
 <img width="1869" height="962" alt="Ürün Detay 2" src="https://github.com/user-attachments/assets/03f6ed01-67fb-48a5-9493-8cbe64f3f835" />
 <img width="1865" height="955" alt="Ürün Detay 3" src="https://github.com/user-attachments/assets/f19f324b-c329-42eb-aa9e-952e7e5620f8" />
 
-> Ürün varyantları (renk, beden, numara, kapasite vb.) dinamik butonlarla seçilir. Seçime göre fiyat farkı (PriceModifier) anlık güncellenir. Stok sıfırsa sepete ekle butonu devre dışı kalır.
+---
 
-</details>
-
-<details>
-<summary><b>Yorum & Değerlendirme</b> — 5 yıldızlı puanlama, yorum geçmişi</summary>
-
-<br>
+#### Yorum & Değerlendirme
+> Giriş yapmış kullanıcılar 1–5 yıldız puan ve yorum bırakabilir. Her kullanıcı bir ürüne yalnızca bir yorum yapabilir. Genel puan ortalaması ve yıldız dağılım grafiği gösterilir.
 
 <img width="1866" height="960" alt="Yorum 1" src="https://github.com/user-attachments/assets/2e4a2694-be32-4033-a7af-5164f2c0498d" />
 <img width="1871" height="956" alt="Yorum 2" src="https://github.com/user-attachments/assets/c74f24a9-d230-4404-bb05-0eb99fdbb7f9" />
 
-> Giriş yapmış kullanıcılar ürüne 1–5 yıldız puan ve yorum bırakabilir. Her kullanıcı bir ürüne yalnızca bir yorum yapabilir. Kendi yorumunu silebilir. Genel puan ortalaması ve yıldız dağılım grafiği gösterilir.
+---
 
-</details>
-
-<details>
-<summary><b>Favorilerim</b> — Kaydedilmiş ürün listesi</summary>
-
-<br>
+#### Favorilerim
+> Ürün kartlarındaki kalp ikonuyla favoriye ekleme/çıkarma yapılır. Her üründen doğrudan sepete ekleme yapılabilir.
 
 <img width="1868" height="956" alt="Favoriler 1" src="https://github.com/user-attachments/assets/6b263123-8fd0-4472-b64d-34e6b4e127e6" />
 <img width="1874" height="957" alt="Favoriler 2" src="https://github.com/user-attachments/assets/b7c7153f-e2dd-488a-8a27-f41a6e2b0445" />
 
-> Ürün kartlarındaki kalp ikonuyla favoriye ekleme/çıkarma yapılır. Favoriler sayfasında grid layout ile tüm kaydedilmiş ürünler listelenir. Her üründen doğrudan sepete ekleme yapılabilir.
+---
 
-</details>
-
-<details>
-<summary><b>Sepet</b> — Redis tabanlı, kupon destekli, sipariş özeti</summary>
-
-<br>
+#### Sepet
+> Sepet verileri Redis'te `cart:{userId}` anahtarıyla tutulur, 30 dakika TTL uygulanır. Kupon kodu ile yüzde veya sabit tutar indirimi uygulanabilir.
 
 <img width="1865" height="953" alt="Sepet 1" src="https://github.com/user-attachments/assets/0c95751c-f4d9-4fea-942c-bccdb71e5cad" />
 <img width="1864" height="953" alt="Sepet 2" src="https://github.com/user-attachments/assets/67d70c53-91c1-47ff-ab1b-ecb4b1ef874a" />
@@ -333,132 +301,130 @@ POST /api/auth/login  →  Email + şifre
 <img width="1869" height="954" alt="Sepet 4" src="https://github.com/user-attachments/assets/373fed01-195e-4a28-9574-c61bf34bef2e" />
 <img width="1863" height="955" alt="Sepet 5" src="https://github.com/user-attachments/assets/bdccb3c6-fb47-42f9-b151-34d33314bda8" />
 
-> Sepet verileri Redis'te `cart:{userId}` anahtarıyla tutulur, 30 dakika TTL uygulanır. Kupon kodu girilebilir; yüzde veya sabit tutar indirimi otomatik hesaplanır. 500₺ üzeri siparişlerde kargo ücretsizdir.
+---
 
-</details>
-
-<details>
-<summary><b>Siparişlerim</b> — Sipariş takip çubuğu, ürün görseli, adres bilgisi</summary>
-
-<br>
+#### Siparişlerim
+> Her sipariş; 4 adımlı takip çubuğu (Sipariş Alındı → Onaylandı → Kargoya Verildi → Teslim Edildi), ürün görselleri ve teslimat adresiyle görüntülenir.
 
 <img width="1860" height="957" alt="Siparişler" src="https://github.com/user-attachments/assets/cfebb72a-5e71-4e6b-a45e-4c96dcd733ea" />
 
-> Her sipariş; sipariş no, tarih, ürün sayısı ve toplam tutarıyla listelenir. Detay açıldığında 4 adımlı takip çubuğu (Sipariş Alındı → Onaylandı → Kargoya Verildi → Teslim Edildi), ürün görselleri ve teslimat adresi görüntülenir.
+---
 
-</details>
-
-<details>
-<summary><b>Profil</b> — Kişisel bilgi güncelleme, şifre değiştirme</summary>
-
-<br>
+#### Profil
+> İki sekmeli yapı: **Hesap Bilgileri** (ad soyad, telefon, cinsiyet, şehir) ve **Şifre** (mevcut şifre doğrulamalı değiştirme).
 
 <img width="1866" height="956" alt="Profil 1" src="https://github.com/user-attachments/assets/7d7a38f4-31ef-4bde-a9c0-6f59d70e8df3" />
 <img width="1864" height="939" alt="Profil 2" src="https://github.com/user-attachments/assets/3b443725-0236-483d-a7b5-7b53dceaa044" />
-
-> Profil sayfası iki sekmeli yapıdan oluşur: **Hesap Bilgileri** (ad soyad, telefon, cinsiyet, şehir) ve **Şifre** (mevcut şifre doğrulamalı değiştirme). Sayfa açıldığında mevcut bilgiler API'den otomatik doldurulur.
-
-</details>
 
 ---
 
 ### Admin Paneli
 
-<details>
-<summary><b>Admin Girişi</b> — Rol tabanlı erişim kontrolü</summary>
-
-<br>
+#### Admin Girişi
+> Yalnızca `Role = Admin` kullanıcılar erişebilir. JWT decode edilir, rol kontrolü yapılır. `OnActionExecuting` her istek için doğrulama yapar.
 
 <img width="1867" height="952" alt="Admin Giriş" src="https://github.com/user-attachments/assets/ba1671a3-c038-4f54-a1af-c830fefc0442" />
 
-> Admin paneline yalnızca `Role = Admin` olan kullanıcılar erişebilir. JWT token decode edilir, rol kontrolü yapılır. Session'a token kaydedilir; her istek `OnActionExecuting` ile doğrulanır.
+---
 
-</details>
-
-<details>
-<summary><b>Dashboard</b> — Anlık istatistikler, grafikler, kritik stok uyarıları</summary>
-
-<br>
+#### Dashboard
+> Toplam sipariş, gelir, ürün ve kullanıcı istatistikleri. Chart.js doughnut kategori dağılımı. En çok sipariş edilen ürünler ve kritik stok uyarıları.
 
 <img width="1869" height="953" alt="Dashboard 1" src="https://github.com/user-attachments/assets/58a9bca6-d21b-45bb-a0d6-ce803317a69d" />
 <img width="1603" height="499" alt="Dashboard 2" src="https://github.com/user-attachments/assets/274b3d45-2287-47c6-9771-42844a097af7" />
 
-> Dashboard'da toplam sipariş, bugünkü sipariş, toplam gelir, bugünkü gelir, ürün ve kullanıcı istatistikleri yer alır. Chart.js doughnut grafiği kategori dağılımını gösterir. En çok sipariş edilen ürünler ve kritik stok uyarıları listelenir.
+---
 
-</details>
-
-<details>
-<summary><b>Ürün Yönetimi</b> — Filtreleme, sayfalama, silme</summary>
-
-<br>
+#### Ürün Yönetimi
+> Kategori, marka ve stok durumuna göre filtreleme. Sayfalama (10 ürün/sayfa). Ürün silme işlemi ProductApi'ye DELETE isteği gönderir.
 
 <img width="1867" height="953" alt="Ürün Yönetimi 1" src="https://github.com/user-attachments/assets/555b9362-d2bc-4c63-8971-271bfa4f0096" />
 <img width="1871" height="953" alt="Ürün Yönetimi 2" src="https://github.com/user-attachments/assets/bd798789-9ad7-49f2-9963-7a17a027014d" />
 <img width="1870" height="953" alt="Ürün Yönetimi 3" src="https://github.com/user-attachments/assets/09743b82-ab40-4502-80a8-c3d0974f4bb4" />
 
-> Tüm ürünler kategori, marka ve stok durumuna göre filtrelenebilir. Sayfalama (10 ürün/sayfa) ile yönetilir. Ürün silme işlemi ProductApi'ye DELETE isteği gönderir.
+---
 
-</details>
-
-<details>
-<summary><b>Sipariş Yönetimi</b> — Detay modal, durum takibi</summary>
-
-<br>
+#### Sipariş Yönetimi
+> Tüm siparişler tarih, tutar ve durum ile listelenir. Detay modalında sipariş kalemleri, ürün adları ve teslimat adresi görüntülenir.
 
 <img width="1869" height="956" alt="Sipariş Yönetimi 1" src="https://github.com/user-attachments/assets/68699751-155e-486b-9d10-74cdcb89d03a" />
 <img width="1866" height="955" alt="Sipariş Yönetimi 2" src="https://github.com/user-attachments/assets/234457d5-a9e6-4e80-b72c-17199d158303" />
 
-> Tüm siparişler tarih, tutar ve durum bilgisiyle listelenir. Detay modalında sipariş kalemleri, ürün adları, adetler ve teslimat adresi görüntülenir. Durum filtresine göre (Bekliyor/Tamamlandı/İptal) listeleme yapılır.
+---
 
-</details>
-
-<details>
-<summary><b>Kargo & Fatura Yönetimi</b> — Takip numarası, fatura yazdırma</summary>
-
-<br>
+#### Kargo & Fatura Yönetimi
+> Kargo takip numaraları CargoWorker tarafından otomatik oluşturulur. Fatura detay modalında `window.print()` ile tarayıcıdan yazdırma desteklenir.
 
 <img width="1869" height="954" alt="Kargo" src="https://github.com/user-attachments/assets/caafc90f-ceb6-4441-9673-9185e4e671dc" />
 <img width="1585" height="737" alt="Fatura 1" src="https://github.com/user-attachments/assets/4586f5dd-d29e-4d65-b392-a52ff7ae2422" />
 <img width="1566" height="401" alt="Fatura 2" src="https://github.com/user-attachments/assets/64756a42-014e-4066-a70e-64a26f8d772c" />
 <img width="1543" height="360" alt="Fatura 3" src="https://github.com/user-attachments/assets/0c9bf35d-4d63-4152-9e95-a28149d40364" />
 
-> Kargo takip numaraları CargoWorker tarafından otomatik oluşturulur. Durum filtresi ile Preparing/Shipped/Delivered ayrımı yapılır. Fatura detay modalında `window.print()` ile tarayıcıdan yazdırma desteklenir.
+---
 
-</details>
-
-<details>
-<summary><b>Kupon Yönetimi</b> — Yüzde & sabit tutar indirim, kullanım limiti</summary>
-
-<br>
+#### Kupon Yönetimi
+> Kupon oluştururken kod, indirim tipi (yüzde/sabit), değer, minimum sipariş tutarı, kullanım limiti ve son tarih belirlenir.
 
 <img width="1868" height="955" alt="Kuponlar" src="https://github.com/user-attachments/assets/321e3e22-bc4e-4162-9c01-fd08e14d148e" />
 
-> Yeni kupon oluştururken kod, indirim tipi (yüzde/sabit), indirim değeri, minimum sipariş tutarı, kullanım limiti ve son kullanma tarihi belirlenir. Aktif/pasif filtresi ile kupon listesi yönetilir.
+---
 
-</details>
-
-<details>
-<summary><b>Kullanıcı Yönetimi</b> — Rol filtresi, hesap detayları</summary>
-
-<br>
+#### Kullanıcı Yönetimi
+> Tüm kullanıcılar ad, e-posta, rol ve kayıt tarihi ile listelenir. Admin/Customer rol filtresi uygulanabilir.
 
 <img width="1868" height="958" alt="Kullanıcılar" src="https://github.com/user-attachments/assets/1f300262-dfda-4a94-8d9f-13115b8fce94" />
 
-> Tüm kullanıcılar ad, e-posta, rol ve kayıt tarihi bilgileriyle listelenir. Admin/Customer rol filtresi uygulanabilir. Her kullanıcının baş harflerinden renkli avatar oluşturulur.
+---
 
-</details>
-
-<details>
-<summary><b>Yorum Yönetimi</b> — Tüm yorumlar, ürün bazlı analiz</summary>
-
-<br>
+#### Yorum Yönetimi
+> Tüm yorumlar kullanıcı adı, ürün referansı, puan ve yorum metniyle listelenir. En çok yorum alan ve en yüksek puanlı ürünler analiz kartlarında gösterilir.
 
 <img width="1869" height="955" alt="Yorumlar 1" src="https://github.com/user-attachments/assets/cbbddf9c-c376-4a1c-b36e-813da7c5cbbd" />
 <img width="1864" height="956" alt="Yorumlar 2" src="https://github.com/user-attachments/assets/ca2c9d5b-785b-4592-ac89-8b7c3eb704e9" />
 
-> Platformdaki tüm yorumlar kullanıcı adı, ürün referansı, puan ve yorum metniyle listelenir. En çok yorum alan ürünler ve en yüksek puanlı ürünler analiz kartlarında gösterilir. Ortalama platform puanı hesaplanır.
+---
 
-</details>
+### Altyapı & DevOps
+
+#### PostgreSQL
+> Ana ilişkisel veritabanı. `Host: localhost · Port: 5433 · DB: SmartCommerce · User: admin`. Users, Products, Orders, Cargos, Invoices tabloları burada tutulur.
+
+> 📷 _PostgreSQL ekran görüntüsünü buraya ekleyin_
+
+---
+
+#### Redis
+> Ürün listesi cache (TTL: 5 dk) ve sepet yönetimi (`cart:{userId}`) için kullanılır. Port: `6381`.
+
+> 📷 _Redis ekran görüntüsünü buraya ekleyin_
+
+---
+
+#### Elasticsearch & Kibana
+> Ürünler PostgreSQL'e kaydedilirken aynı zamanda Elasticsearch'e indekslenir. Serilog ile tüm servis logları Elasticsearch'e yazılır, Kibana'dan izlenir. Port: `9204` (ES) · `5604` (Kibana).
+
+> 📷 _Elasticsearch / Kibana ekran görüntüsünü buraya ekleyin_
+
+---
+
+#### Serilog — Merkezi Loglama
+> Her servis ve worker loglarını hem konsola hem Elasticsearch'e yazar. Index formatı: `{servisadi}-logs-{yil.ay}`.
+
+> 📷 _Serilog / Kibana log akışı ekran görüntüsünü buraya ekleyin_
+
+---
+
+#### RabbitMQ Management
+> `OrderCreated` event'i Fanout exchange ile 5 kuyruğa düşer. Her worker kendi kuyruğunu bağımsız tüketir. Management UI: `http://localhost:15674`.
+
+> 📷 _RabbitMQ Management UI ekran görüntüsünü buraya ekleyin_
+
+---
+
+#### Docker & Swagger
+> Tüm altyapı `docker compose up -d` ile ayağa kalkar. Her API JWT destekli Swagger UI ile dökümante edilmiştir.
+
+> 📷 _Docker Desktop ve Swagger UI ekran görüntüsünü buraya ekleyin_
 
 ---
 
@@ -486,7 +452,7 @@ docker compose up -d
 ### 3. Veritabanı Migration
 
 ```bash
-cd UserApi    && dotnet ef database update
+cd UserApi       && dotnet ef database update
 cd ../ProductApi && dotnet ef database update
 cd ../OrderApi   && dotnet ef database update
 ```
@@ -494,7 +460,6 @@ cd ../OrderApi   && dotnet ef database update
 ### 4. Seed Verisi
 
 ```sql
--- DBeaver veya psql ile çalıştır
 \i seed_products.sql
 ```
 
@@ -515,9 +480,9 @@ UPDATE "Users" SET "Role" = 1 WHERE "Email" = 'admin@berkaystore.com';
 Visual Studio → **Multiple Startup Projects**:
 
 ```
-✅ UserApi          ✅ ProductApi       ✅ OrderApi
+✅ UserApi          ✅ ProductApi        ✅ OrderApi
 ✅ SmartCommerce.UI ✅ NotificationWorker ✅ InvoiceWorker
-✅ CargoWorker      ✅ StockWorker      ✅ PaymentWorker
+✅ CargoWorker      ✅ StockWorker        ✅ PaymentWorker
 ```
 
 ### Erişim Adresleri
