@@ -603,7 +603,8 @@ Visual Studio → **Multiple Startup Projects** ayarla:
 <details>
 <summary>Kargo & Fatura Yönetimi</summary>
 
-<img width="1869" height="954" alt="image" src="https://github.com/user-attachments/assets/caafc90f-ceb6-4441-9673-9185e4e671dc" />
+<img width="1866" height="956" alt="image" src="https://github.com/user-attachments/assets/e0e6f05c-0968-4e67-8382-aba667a12e84" />
+
 
 <img width="1585" height="737" alt="image" src="https://github.com/user-attachments/assets/4586f5dd-d29e-4d65-b392-a52ff7ae2422" />
 
@@ -616,6 +617,7 @@ Visual Studio → **Multiple Startup Projects** ayarla:
 <details>
 <summary>Kupon Yönetimi</summary>
 
+<img width="1861" height="958" alt="image" src="https://github.com/user-attachments/assets/6a3465d6-d154-4d4a-9ffa-d29f11772a44" />
 
 <img width="1868" height="955" alt="image" src="https://github.com/user-attachments/assets/321e3e22-bc4e-4162-9c01-fd08e14d148e" />
 
@@ -623,25 +625,26 @@ Visual Studio → **Multiple Startup Projects** ayarla:
 
 <details>
 <summary>Kullanıcı Yönetimi</summary>
+<img width="1865" height="953" alt="image" src="https://github.com/user-attachments/assets/3ef21b32-332c-46c1-a2e8-e4eab3e30075" />
 
-<img width="1868" height="958" alt="image" src="https://github.com/user-attachments/assets/1f300262-dfda-4a94-8d9f-13115b8fce94" />
 
 </details>
 
 <details>
 <summary>Fatura Yönetimi</summary>
+<img width="1869" height="956" alt="image" src="https://github.com/user-attachments/assets/40ab81d0-1a26-4382-9878-78b0ddccc047" />
+<img width="1857" height="948" alt="image" src="https://github.com/user-attachments/assets/82b0e531-b870-4fd0-89c8-cce32c73a6b4" />
+<img width="1862" height="959" alt="image" src="https://github.com/user-attachments/assets/1b7ec4b0-956b-443d-8191-8a10324fc401" />
 
-<img width="1868" height="955" alt="image" src="https://github.com/user-attachments/assets/7d5e2df5-7e60-4891-9146-d16150833b98" />
-<img width="1869" height="956" alt="image" src="https://github.com/user-attachments/assets/4dcf82ec-fc5e-4d25-b580-13452a356595" />
-<img width="1861" height="960" alt="image" src="https://github.com/user-attachments/assets/f7a2c779-cb44-480f-8cf5-adb21ea4a93f" />
+
 
 </details>
 
 <details>
 <summary>Yorum Yönetimi</summary>
+<img width="1866" height="954" alt="image" src="https://github.com/user-attachments/assets/88db7550-0d32-4fde-ae64-68b437c6d9f7" />
 
-<img width="1869" height="955" alt="image" src="https://github.com/user-attachments/assets/cbbddf9c-c376-4a1c-b36e-813da7c5cbbd" />
-<img width="1864" height="956" alt="image" src="https://github.com/user-attachments/assets/ca2c9d5b-785b-4592-ac89-8b7c3eb704e9" />
+
 
 
 </details>
