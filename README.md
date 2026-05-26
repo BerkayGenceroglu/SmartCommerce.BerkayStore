@@ -1,7 +1,5 @@
 <div align="center">
 
-<img width="1870" height="913" alt="banner" src="https://github.com/user-attachments/assets/30312b1a-9623-456e-a48e-5bbe3409a123" />
-
 # SmartCommerce · Berkay Store
 
 **Mikroservis mimarisi üzerine inşa edilmiş, production-ready e-ticaret platformu**
