@@ -61,39 +61,56 @@
 ## 🧱 Sistem Mimarisi
 
 ```
-                         ┌─────────────────────────────────────────┐
-                         │           SmartCommerce.UI              │
-                         │         (ASP.NET Core MVC)              │
-                         │   Admin Panel  |  Kullanıcı Arayüzü     │
-                         └────────────┬────────────────────────────┘
-                                      │ HTTP (HttpClient)
-              ┌───────────────────────┼─────────────────────┐
-              ▼                       ▼                      ▼
-      ┌──────────────┐     ┌──────────────────┐    ┌──────────────┐
-      │   UserApi    │     │   ProductApi     │    │   OrderApi   │
-      │  JWT Auth    │     │ Elasticsearch    │    │  Cart, Order │
-      │  BCrypt      │     │ Redis Cache      │    │  Coupon      │
-      │  PostgreSQL  │     │ PostgreSQL       │    │  PostgreSQL  │
-      └──────────────┘     └──────────────────┘    └──────┬───────┘
-                                                          │
-                                              ┌───────────▼────────────┐
-                                              │       RabbitMQ         │
-                                              │  (order.created event) │
-                                              └───┬───────┬────────────┘
-                          ┌──────────────────┐    │       │    ┌──────────────────┐
-                          │ NotificationWorker│◄──┘       └───►│  InvoiceWorker   │
-                          │  Email / Bildirim │                 │  Fatura Oluştur  │
-                          └──────────────────┘                 └──────────────────┘
-                          ┌──────────────────┐    ┌──────────────────┐  ┌──────────────────┐
-                          │   StockWorker    │    │   CargoWorker    │  │  PaymentWorker   │
-                          │   Stok Düş       │    │  Kargo Oluştur   │  │  Ödeme İşle      │
-                          └──────────────────┘    └──────────────────┘  └──────────────────┘
+╔══════════════════════════════════════════════════════════════╗
+║                    SmartCommerce.UI                          ║
+║              ASP.NET Core MVC  |  Razor Views                ║
+║         👤 Kullanıcı Arayüzü   |   🛡️ Admin Paneli           ║
+╚══════════════╤═══════════════════════════╤═══════════════════╝
+               │      HTTP / HttpClient    │
+     ┌─────────┼───────────────────────────┼─────────┐
+     ▼         ▼                           ▼         ▼
+┌─────────┐ ┌──────────────────┐ ┌──────────────────────────┐
+│ UserApi │ │   ProductApi     │ │        OrderApi           │
+│─────────│ │──────────────────│ │──────────────────────────│
+│ • Kayıt │ │ • Ürün CRUD      │ │ • Sepet Yönetimi (Redis)  │
+│ • Giriş │ │ • Elasticsearch  │ │ • Sipariş Oluşturma       │
+│ • JWT   │ │   (Arama/Index)  │ │ • Kupon Doğrulama         │
+│ • Profil│ │ • Redis Cache    │ │ • RabbitMQ Event Yayını   │
+│ • BCrypt│ │ • Kategori CRUD  │ │ • Dashboard (Admin)       │
+└────┬────┘ └────────┬─────────┘ └────────────┬─────────────┘
+     │               │                        │
+     └───────────────┴──────── PostgreSQL ─────┘
+                                              │
+                                             ▼
+                              ╔══════════════════════════╗
+                              ║         RabbitMQ          ║
+                              ║   📨 order.created event  ║
+                              ║   (Fanout / Pub-Sub)      ║
+                              ╚══╤═══╤════╤═════╤════════╝
+              ┌──────────────────┘   │    │     └─────────────────┐
+              ▼                      ▼    ▼                        ▼
+   ┌─────────────────┐  ┌──────────────────┐  ┌──────────────────────────┐
+   │NotificationWorker│  │  InvoiceWorker   │  │      CargoWorker          │
+   │─────────────────│  │──────────────────│  │──────────────────────────│
+   │ 📧 E-posta Gönder│  │ 🧾 Fatura Oluştur│  │ 🚚 Kargo Kaydı Oluştur   │
+   │ 🔔 Bildirim Yaz  │  │ 📄 DB'ye Kaydet  │  │ 📦 Takip No Ata           │
+   └─────────────────┘  └──────────────────┘  └──────────────────────────┘
+              ▼                                          ▼
+   ┌─────────────────┐                    ┌──────────────────────────┐
+   │   StockWorker   │                    │      PaymentWorker        │
+   │─────────────────│                    │──────────────────────────│
+   │ 📉 Stok Düş     │                    │ 💳 Ödeme İşlemi Gerçekleş│
+   │ 🔄 Stok Güncelle│                    │ 📝 Ödeme Kaydı Oluştur   │
+   └─────────────────┘                    └──────────────────────────┘
 
-                    ┌────────────────────────────────────────────────────────┐
-                    │              Ortak Altyapı (Docker Network)            │
-                    │  PostgreSQL  │  Redis  │  RabbitMQ  │  Elasticsearch  │
-                    │              │         │            │  + Kibana        │
-                    └────────────────────────────────────────────────────────┘
+╔══════════════════════════════════════════════════════════════════════╗
+║                    🐳 Docker Altyapısı (smartcommerce-net)           ║
+║                                                                      ║
+║   🐘 PostgreSQL    🔴 Redis    🐇 RabbitMQ    🔍 Elasticsearch       ║
+║   (port: 5433)   (port: 6381) (port: 5674)   (port: 9204)           ║
+║                                                  📊 Kibana           ║
+║                                                  (port: 5604)        ║
+╚══════════════════════════════════════════════════════════════════════╝
 ```
 
 ---
@@ -139,9 +156,9 @@ SmartCommerce/
 │   │   └── Views/                     └─ Home, Product, Cart, Order, Favorite,
 │   │                                      Profile, Auth, Admin sayfaları
 │   │
-│   ├── NotificationWorker/            # RabbitMQ'dan order.created dinler → bildirim/e-posta
+│   ├── NotificationWorker/            # RabbitMQ'dan order.created dinler → e-posta / bildirim
 │   ├── InvoiceWorker/                 # order.created → fatura oluşturur, PostgreSQL'e kaydeder
-│   ├── CargoWorker/                   # order.created → kargo kaydı oluşturur
+│   ├── CargoWorker/                   # order.created → kargo kaydı ve takip numarası oluşturur
 │   ├── StockWorker/                   # order.created → ürün stoğunu düşürür
 │   └── PaymentWorker/                 # order.created → ödeme işlemi gerçekleştirir
 │
@@ -159,36 +176,51 @@ SmartCommerce/
 ## 🔁 Event-Driven Akış — Sipariş Yaşam Döngüsü
 
 ```
-Kullanıcı "Sipariş Ver" butonuna basar
-              │
-              ▼
-         OrderApi
-   1. Validasyon (ürün/stok kontrolü)
-   2. PostgreSQL'e sipariş kaydeder
-   3. Redis cache günceller
-   4. RabbitMQ'ya "order.created" event yayınlar
-   5. 201 Created döner
-              │
-              ▼
-         RabbitMQ
-    order.created event
-    (Fanout / Pub-Sub)
-    ┌──────────┬──────────┬──────────┬──────────┐
-    ▼          ▼          ▼          ▼          ▼
-Notification  Invoice  Cargo    Stock     Payment
- Worker       Worker   Worker   Worker    Worker
-  │             │        │        │          │
-Bildirim     Fatura   Kargo    Stoku       Ödeme
-oluştur      kaydet   oluştur   düş        işle
+ ┌──────────────────────────────────────────────────────────────────┐
+ │   👤 Kullanıcı "Sipariş Ver" butonuna basar                       │
+ └──────────────────────────────┬───────────────────────────────────┘
+                                ▼
+ ┌──────────────────────────────────────────────────────────────────┐
+ │                         OrderApi                                  │
+ │                                                                   │
+ │   ① Validasyon     →  Ürün var mı? Stok yeterli mi?              │
+ │   ② Kayıt          →  PostgreSQL'e sipariş yazılır               │
+ │   ③ Cache          →  Redis güncellenir                           │
+ │   ④ Event Yayını   →  RabbitMQ'ya "order.created" gönderilir     │
+ │   ⑤ Yanıt          →  201 Created döner, kullanıcı yönlendirilir │
+ └──────────────────────────────┬───────────────────────────────────┘
+                                ▼
+ ┌──────────────────────────────────────────────────────────────────┐
+ │                   🐇 RabbitMQ                                     │
+ │          "order.created" event — Fanout / Pub-Sub                 │
+ │   Aynı event 5 farklı kuyruğa düşer, her worker kendi kuyruğunu  │
+ │   bağımsız olarak tüketir. Hiçbiri diğerini beklemez.            │
+ └───┬──────────┬──────────┬──────────┬──────────────┬─────────────┘
+     │          │          │          │              │
+     ▼          ▼          ▼          ▼              ▼
+┌─────────┐ ┌────────┐ ┌────────┐ ┌────────┐  ┌─────────┐
+│Notifi-  │ │Invoice │ │ Cargo  │ │ Stock  │  │Payment  │
+│cation   │ │Worker  │ │Worker  │ │Worker  │  │Worker   │
+│Worker   │ │        │ │        │ │        │  │         │
+│─────────│ │────────│ │────────│ │────────│  │─────────│
+│📧 E-posta│ │🧾Fatura│ │🚚Kargo │ │📉Stok  │  │💳Ödeme  │
+│🔔Bildirim│ │  Oluşt │ │  Kayıt │ │  Düşür │  │  İşle   │
+│  Oluştur│ │  DB'ye │ │  Takip │ │  DB    │  │  DB'ye  │
+│  DB'ye  │ │  Kaydet│ │  No Ata│ │  Güncl │  │  Kaydet │
+└─────────┘ └────────┘ └────────┘ └────────┘  └─────────┘
 ```
 
-Her worker **bağımsız** çalışır; birbirini beklemez, birbirini etkilemez. Tek bir event 5 kuyruğa düşer.
+> 💡 **MassTransit** kuyrukları otomatik oluşturur. Her worker yalnızca kendi `IConsumer<OrderCreatedEvent>` implementasyonunu yazar, routing tamamen soyutlanmıştır.
 
 ---
 
 ## 🐳 Docker — Altyapı Servisleri
 
 Tüm bağımlılıklar Docker Compose ile tek komutta ayağa kalkar:
+
+```bash
+docker compose up -d
+```
 
 ```yaml
 services:
@@ -197,7 +229,7 @@ services:
     container_name: smartcommerce-rabbitmq
     ports:
       - "5674:5672"      # AMQP
-      - "15674:15672"    # Management UI → http://localhost:15674
+      - "15674:15672"    # Management UI
     environment:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
@@ -232,7 +264,7 @@ services:
     image: kibana:8.11.0
     container_name: smartcommerce-kibana
     ports:
-      - "5604:5601"     # Kibana UI → http://localhost:5604
+      - "5604:5601"
     depends_on:
       - elasticsearch
 
@@ -243,14 +275,14 @@ networks:
 
 ### Konteyner Port Özeti
 
-| Servis | Container Adı | Dış Port | İç Port |
-|--------|---------------|----------|---------|
-| RabbitMQ (AMQP) | smartcommerce-rabbitmq | 5674 | 5672 |
-| RabbitMQ (UI) | smartcommerce-rabbitmq | 15674 | 15672 |
-| Redis | smartcommerce-redis | 6381 | 6379 |
-| PostgreSQL | smartcommerce-postgres | 5433 | 5432 |
-| Elasticsearch | smartcommerce-elasticsearch | 9204 | 9200 |
-| Kibana | smartcommerce-kibana | 5604 | 5601 |
+| Servis | Container Adı | Dış Port | Açıklama |
+|--------|---------------|----------|----------|
+| RabbitMQ (AMQP) | smartcommerce-rabbitmq | **5674** | Mesaj kuyruğu bağlantısı |
+| RabbitMQ (UI) | smartcommerce-rabbitmq | **15674** | `http://localhost:15674` |
+| Redis | smartcommerce-redis | **6381** | Cache & Sepet |
+| PostgreSQL | smartcommerce-postgres | **5433** | Ana veritabanı |
+| Elasticsearch | smartcommerce-elasticsearch | **9204** | Arama & Loglama |
+| Kibana | smartcommerce-kibana | **5604** | `http://localhost:5604` |
 
 ---
 
@@ -279,19 +311,19 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 ### JWT Akışı
 
 ```
-1. POST /api/auth/login   → Credentials gönder
-2. UserApi → BCrypt ile şifre doğrula
-3. JWT token üret (HS256, 7 günlük)
-4. Token döner
-5. Sonraki isteklerde: Authorization: Bearer <token>
-6. Swagger UI'da 🔒 Authorize → "Bearer eyJhbGci..."
+① POST /api/auth/login      →  Email + şifre gönder
+② UserApi                   →  BCrypt ile şifre doğrula
+③ Token Üretimi             →  HS256, 7 günlük JWT oluştur
+④ Token Döner               →  Access Token client'a iletilir
+⑤ Korumalı İstek            →  Authorization: Bearer eyJhbGci...
+⑥ Swagger'da Test           →  🔒 Authorize → "Bearer ..." yapıştır
 ```
 
 ---
 
 ## 📊 Serilog + Elasticsearch + Kibana — Merkezi Loglama
 
-Her servis (API + Worker), loglarını hem konsola hem de **Elasticsearch'e** yazar. Kibana üzerinden tüm loglar tek panelde izlenebilir.
+Her servis ve worker, loglarını hem konsola hem de **Elasticsearch'e** yazar. Kibana üzerinden tüm sistem logları tek panelde izlenebilir.
 
 ```csharp
 Log.Logger = new LoggerConfiguration()
@@ -306,94 +338,35 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 ```
 
-### Index Formatları
-
-| Servis | Elasticsearch Index |
-|--------|-------------------|
-| UserApi | `userapi-logs-yyyy.MM` |
-| ProductApi | `productapi-logs-yyyy.MM` |
-| OrderApi | `orderapi-logs-yyyy.MM` |
-| NotificationWorker | `notificationworker-logs-yyyy.MM` |
-| InvoiceWorker | `invoiceworker-logs-yyyy.MM` |
-| CargoWorker | `cargoworker-logs-yyyy.MM` |
-| StockWorker | `stockworker-logs-yyyy.MM` |
-| PaymentWorker | `paymentworker-logs-yyyy.MM` |
-
 Kibana'ya erişim: `http://localhost:5604`
 
 ---
 
-## ⚡ Redis — Önbellekleme & Session
+## ⚡ Redis — Önbellekleme & Sepet Yönetimi
 
 Redis iki amaçla kullanılır:
 
 **1. Ürün Cache (ProductApi)**
 ```csharp
-// Ürün listesi cache'e alınır
+// Ürünü cache'e al
 await _redis.SetStringAsync($"product:{id}", JsonSerializer.Serialize(product));
 
 // Cache'den oku, yoksa DB'den çek
 var cached = await _redis.GetStringAsync($"product:{id}");
 ```
 
-**2. Sepet Yönetimi (OrderApi)**  
-Kullanıcının sepeti Redis'te `cart:{userId}` anahtarıyla tutulur. Hızlı okuma/yazma sağlar, sipariş onaylandığında temizlenir.
+**2. Sepet Yönetimi (OrderApi)**
+Kullanıcının sepeti Redis'te `cart:{userId}` anahtarıyla tutulur. Sipariş onaylandığında temizlenir.
 
 **Bağlantı:** `localhost:6381`
 
 ---
 
-## 🐇 RabbitMQ + MassTransit — Mesaj Kuyruğu
+## 🔍 Elasticsearch — Ürün Arama & İndeksleme
 
-MassTransit, RabbitMQ üzerinde Publish/Subscribe pattern'ını soyutlar. Manuel kuyruk tanımına gerek yoktur; `ConfigureEndpoints` ile otomatik oluşturulur.
-
-```csharp
-// OrderApi — Event Yayınla
-await _publishEndpoint.Publish(new OrderCreatedEvent
-{
-    OrderId = order.Id,
-    UserId = order.UserId,
-    TotalAmount = order.TotalAmount,
-    Items = order.Items.Select(i => new OrderCreatedItem
-    {
-        ProductId = i.ProductId,
-        Quantity = i.Quantity,
-        Price = i.Price
-    }).ToList()
-});
-```
+ProductApi, ürünleri PostgreSQL'e kaydederken aynı zamanda Elasticsearch'e indeksler.
 
 ```csharp
-// Worker — Event Tüket
-public class OrderCreatedConsumer : IConsumer<OrderCreatedEvent>
-{
-    public async Task Consume(ConsumeContext<OrderCreatedEvent> context)
-    {
-        var order = context.Message;
-        // İş mantığı burada
-    }
-}
-```
-
-RabbitMQ Management UI: `http://localhost:15674`  
-Kullanıcı: `guest` | Şifre: `guest`
-
----
-
-## 🔍 Elasticsearch — Ürün Arama
-
-ProductApi, ürünleri PostgreSQL'e kaydederken aynı zamanda Elasticsearch'e indeksler. Gelişmiş full-text arama ve filtreleme bu index üzerinden yapılır.
-
-```csharp
-// Index oluştur
-var settings = new ConnectionSettings(new Uri(elasticUri))
-    .DefaultIndex("products");
-var client = new ElasticClient(settings);
-
-// Ürün indeksle
-await _elasticClient.IndexDocumentAsync(product);
-
-// Ara
 var result = await _elasticClient.SearchAsync<Product>(s => s
     .Query(q => q
         .MultiMatch(m => m
@@ -405,69 +378,6 @@ var result = await _elasticClient.SearchAsync<Product>(s => s
 ```
 
 Re-index endpoint: `POST /api/product/reindex`
-
----
-
-## 🗄️ Veritabanı Şeması
-
-### Users
-| Kolon | Tip | Açıklama |
-|-------|-----|----------|
-| Id | UUID | Primary key |
-| FullName | text | Ad soyad |
-| Email | text | E-posta (unique) |
-| PasswordHash | text | BCrypt hash |
-| Role | int4 | 0: Customer, 1: Admin |
-| PhoneNumber | text | Telefon |
-| Gender | text | Cinsiyet |
-| City | text | Şehir |
-| CreatedAt | timestamptz | Kayıt tarihi |
-
-### Products
-| Kolon | Tip | Açıklama |
-|-------|-----|----------|
-| Id | UUID | Primary key |
-| Name | text | Ürün adı |
-| Brand | text | Marka |
-| Price | numeric | Fiyat |
-| Stock | int4 | Stok adedi |
-| CategoryId | UUID | Foreign key |
-| IsActive | bool | Aktif mi |
-| ImageUrl | text | Görsel URL |
-| CreatedAt | timestamptz | Oluşturma tarihi |
-
-### Orders
-| Kolon | Tip | Açıklama |
-|-------|-----|----------|
-| Id | UUID | Primary key |
-| UserId | UUID | Kullanıcı |
-| TotalAmount | numeric | Toplam tutar |
-| Address | text | Teslimat adresi |
-| Status | int4 | 0: Bekliyor, 1: Tamamlandı, 2: İptal |
-| CreatedAt | timestamptz | Sipariş tarihi |
-
-### Cargos
-| Kolon | Tip | Açıklama |
-|-------|-----|----------|
-| Id | UUID | Primary key |
-| OrderId | UUID | Sipariş |
-| UserId | UUID | Kullanıcı |
-| TrackingNumber | text | Takip numarası |
-| Status | int4 | 0: Hazırlanıyor, 1: Kargoda, 2: Teslim Edildi |
-| CreatedAt | timestamptz | Oluşturma tarihi |
-
-### Coupons
-| Kolon | Tip | Açıklama |
-|-------|-----|----------|
-| Id | UUID | Primary key |
-| Code | text | Kupon kodu |
-| DiscountType | int4 | 0: Yüzde, 1: Sabit |
-| DiscountValue | numeric | İndirim miktarı |
-| MinOrderAmount | numeric | Min sipariş tutarı |
-| UsageLimit | int4 | Kullanım limiti |
-| UsageCount | int4 | Kullanım sayısı |
-| IsActive | bool | Aktif mi |
-| ExpiresAt | timestamptz | Son kullanma tarihi |
 
 ---
 
@@ -513,90 +423,20 @@ cd SmartCommerce.BerkayStore
 docker compose up -d
 ```
 
-Tüm konteynerler ayağa kalktıktan sonra:
-
-| Servis | URL |
-|--------|-----|
-| RabbitMQ Management | http://localhost:15674 |
-| Kibana | http://localhost:5604 |
-| PostgreSQL | localhost:5433 |
-| Redis | localhost:6381 |
-| Elasticsearch | http://localhost:9204 |
-
-### 4. appsettings.json Yapılandırması
-
-Her proje için `appsettings.json`:
-
-```json
-{
-  "ConnectionStrings": {
-    "DefaultConnection": "Host=localhost;Port=5433;Database=SmartCommerce;Username=admin;Password=admin123"
-  },
-  "Redis": {
-    "ConnectionString": "localhost:6381"
-  },
-  "Jwt": {
-    "Key": "smartcommerce-super-secret-key-2024-must-be-long",
-    "Issuer": "https://auth.smartcommerce.com",
-    "Audience": "https://api.smartcommerce.com",
-    "ExpiresDays": 7
-  },
-  "RabbitMq": {
-    "Host": "localhost",
-    "Port": 5674,
-    "Username": "guest",
-    "Password": "guest"
-  },
-  "Elasticsearch": {
-    "Uri": "http://localhost:9204"
-  },
-  "Serilog": {
-    "MinimumLevel": "Information"
-  },
-  "AllowedHosts": "*"
-}
-```
-
-### 5. Veritabanı Migration
-
-Package Manager Console'da sırayla her projeyi seçip:
-
-```bash
-# UserApi
-Add-Migration InitialCreate -Project UserApi
-Update-Database -Project UserApi
-
-# ProductApi
-Add-Migration InitialCreate -Project ProductApi
-Update-Database -Project ProductApi
-
-# OrderApi
-Add-Migration InitialCreate -Project OrderApi
-Update-Database -Project OrderApi
-
-# InvoiceWorker
-Add-Migration InitialCreate -Project InvoiceWorker
-Update-Database -Project InvoiceWorker
-
-# CargoWorker
-Add-Migration InitialCreate -Project CargoWorker
-Update-Database -Project CargoWorker
-```
-
-### 6. Seed Verisi
+### 4. Seed Verisi
 
 ```sql
 -- DBeaver veya psql ile çalıştır
 \i seed_products.sql
 ```
 
-### 7. Elasticsearch Re-Index
+### 5. Elasticsearch Re-Index
 
 ```
 POST https://localhost:7136/api/product/reindex
 ```
 
-### 8. Projeleri Başlat
+### 6. Projeleri Başlat
 
 Visual Studio → **Multiple Startup Projects** ayarla:
 
@@ -611,6 +451,149 @@ Visual Studio → **Multiple Startup Projects** ayarla:
 ✅ StockWorker
 ✅ PaymentWorker
 ```
+
+---
+
+## 📸 Ekran Görüntüleri
+
+### 🔐 Kimlik Doğrulama
+
+<details>
+<summary>Giriş & Kayıt Sayfaları</summary>
+
+<!-- LOGIN -->
+**Giriş Yap**
+> 📷 _Buraya login sayfası ekran görüntüsü ekle_
+
+<!-- REGISTER -->
+**Kayıt Ol**
+> 📷 _Buraya register sayfası ekran görüntüsü ekle_
+
+</details>
+
+---
+
+### 🏠 Kullanıcı Arayüzü
+
+<details>
+<summary>Ana Sayfa</summary>
+
+> 📷 _Buraya ana sayfa (hero banner, öne çıkan ürünler, kategoriler) ekran görüntüsü ekle_
+
+</details>
+
+<details>
+<summary>Ürün Listeleme & Arama</summary>
+
+> 📷 _Buraya ürün listesi ve kategori filtresi ekran görüntüsü ekle_
+
+</details>
+
+<details>
+<summary>Ürün Detay Sayfası</summary>
+
+> 📷 _Buraya ürün detay (görsel, açıklama, fiyat, sepete ekle) ekran görüntüsü ekle_
+
+</details>
+
+<details>
+<summary>Sepet Sayfası</summary>
+
+> 📷 _Buraya sepet (ürün listesi, kupon kodu, toplam) ekran görüntüsü ekle_
+
+</details>
+
+<details>
+<summary>Sipariş & Ödeme</summary>
+
+> 📷 _Buraya checkout formu ve ödeme sayfası ekran görüntüsü ekle_
+
+</details>
+
+<details>
+<summary>Sipariş Geçmişi & Profil</summary>
+
+> 📷 _Buraya siparişlerim ve profil sayfası ekran görüntüsü ekle_
+
+</details>
+
+---
+
+### 🛡️ Admin Paneli
+
+<details>
+<summary>Dashboard</summary>
+
+> 📷 _Buraya admin dashboard (istatistikler, grafikler) ekran görüntüsü ekle_
+
+</details>
+
+<details>
+<summary>Ürün Yönetimi</summary>
+
+> 📷 _Buraya ürün listesi, ekleme ve düzenleme ekran görüntüsü ekle_
+
+</details>
+
+<details>
+<summary>Sipariş Yönetimi</summary>
+
+> 📷 _Buraya sipariş listesi ve detay ekran görüntüsü ekle_
+
+</details>
+
+<details>
+<summary>Kullanıcı & Rol Yönetimi</summary>
+
+> 📷 _Buraya kullanıcı listesi ve rol atama ekran görüntüsü ekle_
+
+</details>
+
+<details>
+<summary>Kargo & Fatura Yönetimi</summary>
+
+> 📷 _Buraya kargo listesi ve fatura ekran görüntüsü ekle_
+
+</details>
+
+<details>
+<summary>Kupon Yönetimi</summary>
+
+> 📷 _Buraya kupon oluşturma ve listeleme ekran görüntüsü ekle_
+
+</details>
+
+---
+
+### 🐳 Docker & Altyapı
+
+<details>
+<summary>Docker Containers</summary>
+
+> 📷 _Buraya Docker Desktop veya `docker ps` çıktısı ekran görüntüsü ekle_
+
+</details>
+
+<details>
+<summary>RabbitMQ Management UI</summary>
+
+> 📷 _Buraya RabbitMQ kuyruk ekranı (http://localhost:15674) ekran görüntüsü ekle_
+
+</details>
+
+<details>
+<summary>Kibana Dashboard</summary>
+
+> 📷 _Buraya Kibana log akışı ekran görüntüsü ekle_
+
+</details>
+
+<details>
+<summary>Swagger UI</summary>
+
+> 📷 _Buraya Swagger API dökümantasyonu ekran görüntüsü ekle_
+
+</details>
 
 ---
 
