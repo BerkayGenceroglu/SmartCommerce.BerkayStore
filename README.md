@@ -536,22 +536,27 @@ Visual Studio → **Multiple Startup Projects** ayarla:
 
 <details>
 <summary>Sepet Sayfası</summary>
+<img width="1865" height="953" alt="image" src="https://github.com/user-attachments/assets/0c95751c-f4d9-4fea-942c-bccdb71e5cad" />
+<img width="1864" height="953" alt="image" src="https://github.com/user-attachments/assets/67d70c53-91c1-47ff-ab1b-ecb4b1ef874a" />
+<img width="1870" height="951" alt="image" src="https://github.com/user-attachments/assets/fc34838b-8c3a-493f-b718-4fe710e44411" />
+<img width="1869" height="954" alt="image" src="https://github.com/user-attachments/assets/373fed01-195e-4a28-9574-c61bf34bef2e" />
+<img width="1863" height="955" alt="image" src="https://github.com/user-attachments/assets/bdccb3c6-fb47-42f9-b151-34d33314bda8" />
 
 
 
 </details>
 
-<details>
-<summary>Sipariş & Ödeme</summary>
 
-> 📷 _Buraya checkout formu ve ödeme sayfası ekran görüntüsü ekle_
-
-</details>
-
-<details>
 <summary>Sipariş Geçmişi & Profil</summary>
 
-> 📷 _Buraya siparişlerim ve profil sayfası ekran görüntüsü ekle_
+<img width="1860" height="957" alt="image" src="https://github.com/user-attachments/assets/cfebb72a-5e71-4e6b-a45e-4c96dcd733ea" />
+
+</details>
+
+<details>
+
+<img width="1866" height="956" alt="image" src="https://github.com/user-attachments/assets/7d7a38f4-31ef-4bde-a9c0-6f59d70e8df3" />
+<img width="1864" height="939" alt="image" src="https://github.com/user-attachments/assets/3b443725-0236-483d-a7b5-7b53dceaa044" />
 
 </details>
 
