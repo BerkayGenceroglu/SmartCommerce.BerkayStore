@@ -1,4 +1,4 @@
-<h1 align="center">🛒 SmartCommerce.BerkayStore</h1>
+<img width="1870" height="913" alt="image" src="https://github.com/user-attachments/assets/30312b1a-9623-456e-a48e-5bbe3409a123" /><h1 align="center">🛒 SmartCommerce.BerkayStore</h1>
 
 <p align="center">
   <b>Modern Mikroservis E-Ticaret Platformu</b><br/>
@@ -565,44 +565,84 @@ Visual Studio → **Multiple Startup Projects** ayarla:
 ### 🛡️ Admin Paneli
 
 <details>
-<summary>Dashboard</summary>
+<summary>Giriş</summary>
 
-> 📷 _Buraya admin dashboard (istatistikler, grafikler) ekran görüntüsü ekle_
+<img width="1867" height="952" alt="image" src="https://github.com/user-attachments/assets/ba1671a3-c038-4f54-a1af-c830fefc0442" />
+
+</details>
+
+<details>
+<summary>Dashboard</summary>
+<img width="1869" height="953" alt="image" src="https://github.com/user-attachments/assets/58a9bca6-d21b-45bb-a0d6-ce803317a69d" />
+<img width="1603" height="499" alt="image" src="https://github.com/user-attachments/assets/274b3d45-2287-47c6-9771-42844a097af7" />
+
+
 
 </details>
 
 <details>
 <summary>Ürün Yönetimi</summary>
+<img width="1867" height="953" alt="image" src="https://github.com/user-attachments/assets/555b9362-d2bc-4c63-8971-271bfa4f0096" />
+<img width="1871" height="953" alt="image" src="https://github.com/user-attachments/assets/bd798789-9ad7-49f2-9963-7a17a027014d" />
+<img width="1870" height="953" alt="image" src="https://github.com/user-attachments/assets/09743b82-ab40-4502-80a8-c3d0974f4bb4" />
 
-> 📷 _Buraya ürün listesi, ekleme ve düzenleme ekran görüntüsü ekle_
+
 
 </details>
 
 <details>
 <summary>Sipariş Yönetimi</summary>
+<img width="1869" height="956" alt="image" src="https://github.com/user-attachments/assets/68699751-155e-486b-9d10-74cdcb89d03a" />
+<img width="1866" height="955" alt="image" src="https://github.com/user-attachments/assets/234457d5-a9e6-4e80-b72c-17199d158303" />
 
-> 📷 _Buraya sipariş listesi ve detay ekran görüntüsü ekle_
 
-</details>
-
-<details>
-<summary>Kullanıcı & Rol Yönetimi</summary>
-
-> 📷 _Buraya kullanıcı listesi ve rol atama ekran görüntüsü ekle_
 
 </details>
+
 
 <details>
 <summary>Kargo & Fatura Yönetimi</summary>
 
-> 📷 _Buraya kargo listesi ve fatura ekran görüntüsü ekle_
+<img width="1869" height="954" alt="image" src="https://github.com/user-attachments/assets/caafc90f-ceb6-4441-9673-9185e4e671dc" />
+
+<img width="1585" height="737" alt="image" src="https://github.com/user-attachments/assets/4586f5dd-d29e-4d65-b392-a52ff7ae2422" />
+
+<img width="1566" height="401" alt="image" src="https://github.com/user-attachments/assets/64756a42-014e-4066-a70e-64a26f8d772c" />
+
+<img width="1543" height="360" alt="image" src="https://github.com/user-attachments/assets/0c9bf35d-4d63-4152-9e95-a28149d40364" />
 
 </details>
 
 <details>
 <summary>Kupon Yönetimi</summary>
 
-> 📷 _Buraya kupon oluşturma ve listeleme ekran görüntüsü ekle_
+
+<img width="1868" height="955" alt="image" src="https://github.com/user-attachments/assets/321e3e22-bc4e-4162-9c01-fd08e14d148e" />
+
+</details>
+
+<details>
+<summary>Kullanıcı Yönetimi</summary>
+
+<img width="1868" height="958" alt="image" src="https://github.com/user-attachments/assets/1f300262-dfda-4a94-8d9f-13115b8fce94" />
+
+</details>
+
+<details>
+<summary>Fatura Yönetimi</summary>
+
+<img width="1868" height="955" alt="image" src="https://github.com/user-attachments/assets/7d5e2df5-7e60-4891-9146-d16150833b98" />
+<img width="1869" height="956" alt="image" src="https://github.com/user-attachments/assets/4dcf82ec-fc5e-4d25-b580-13452a356595" />
+<img width="1861" height="960" alt="image" src="https://github.com/user-attachments/assets/f7a2c779-cb44-480f-8cf5-adb21ea4a93f" />
+
+</details>
+
+<details>
+<summary>Yorum Yönetimi</summary>
+
+<img width="1869" height="955" alt="image" src="https://github.com/user-attachments/assets/cbbddf9c-c376-4a1c-b36e-813da7c5cbbd" />
+<img width="1864" height="956" alt="image" src="https://github.com/user-attachments/assets/ca2c9d5b-785b-4592-ac89-8b7c3eb704e9" />
+
 
 </details>
 
