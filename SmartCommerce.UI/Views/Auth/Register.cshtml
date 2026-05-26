@@ -16,7 +16,7 @@
     .auth-container {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        max-width: 900px;
+        max-width: 960px;
         width: 100%;
         border: 1px solid var(--border);
         border-radius: 16px;
@@ -109,6 +109,7 @@
         display: flex;
         flex-direction: column;
         justify-content: center;
+        overflow-y: auto;
     }
 
         .auth-form h1 {
@@ -122,7 +123,7 @@
         .auth-form .subtitle {
             color: var(--text-muted);
             font-size: 0.85rem;
-            margin-bottom: 2rem;
+            margin-bottom: 1.75rem;
         }
 
             .auth-form .subtitle a {
@@ -131,7 +132,7 @@
             }
 
     .form-group {
-        margin-bottom: 1.25rem;
+        margin-bottom: 1rem;
     }
 
         .form-group label {
@@ -144,7 +145,8 @@
             text-transform: uppercase;
         }
 
-        .form-group input {
+        .form-group input,
+        .form-group select {
             width: 100%;
             background: var(--surface2);
             border: 1px solid var(--border);
@@ -152,24 +154,52 @@
             font-family: var(--font-body);
             font-size: 0.9rem;
             font-weight: 300;
-            padding: 0.75rem 1rem;
+            padding: 0.7rem 1rem;
             border-radius: 8px;
             outline: none;
             transition: border-color 0.2s;
+            box-sizing: border-box;
         }
 
-            .form-group input:focus {
+        .form-group select {
+            cursor: pointer;
+        }
+
+            .form-group input:focus,
+            .form-group select:focus {
                 border-color: var(--accent);
             }
 
-            .form-group input::placeholder {
-                color: var(--text-muted);
-            }
+        .form-group input::placeholder {
+            color: var(--text-muted);
+        }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+    }
+
+    .form-divider {
+        height: 1px;
+        background: var(--border);
+        margin: 1rem 0 1.25rem;
+        position: relative;
+    }
+
+    .form-divider-label {
+        font-size: 0.68rem;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        margin-bottom: 1rem;
+    }
 
     .btn-submit {
         width: 100%;
         background: var(--accent);
-        color: #000;
+        color: #fff;
         border: none;
         font-family: var(--font-display);
         font-weight: 700;
@@ -194,7 +224,7 @@
     .error-msg {
         background: rgba(255,80,80,0.1);
         border: 1px solid rgba(255,80,80,0.3);
-        color: #ff8080;
+        color: #ff5050;
         font-size: 0.82rem;
         padding: 0.65rem 1rem;
         border-radius: 6px;
@@ -202,13 +232,27 @@
     }
 
     .success-msg {
-        background: rgba(200,245,87,0.1);
-        border: 1px solid rgba(200,245,87,0.3);
+        background: rgba(26,107,60,0.08);
+        border: 1px solid rgba(26,107,60,0.2);
         color: var(--accent);
         font-size: 0.82rem;
         padding: 0.65rem 1rem;
         border-radius: 6px;
         margin-bottom: 1rem;
+    }
+
+    @@media (max-width: 768px) {
+        .auth-container {
+            grid-template-columns: 1fr;
+        }
+
+        .auth-visual {
+            display: none;
+        }
+
+        .form-row {
+            grid-template-columns: 1fr;
+        }
     }
 </style>
 
@@ -221,22 +265,10 @@
                 <p>Ücretsiz üyelikle binlerce ürüne erişim, sipariş takibi ve çok daha fazlası.</p>
             </div>
             <div class="auth-perks">
-                <div class="auth-perk">
-                    <i class="fas fa-check"></i>
-                    <span>Ücretsiz üyelik, hızlı kayıt</span>
-                </div>
-                <div class="auth-perk">
-                    <i class="fas fa-check"></i>
-                    <span>Sipariş takibi ve geçmişi</span>
-                </div>
-                <div class="auth-perk">
-                    <i class="fas fa-check"></i>
-                    <span>Güvenli ödeme altyapısı</span>
-                </div>
-                <div class="auth-perk">
-                    <i class="fas fa-check"></i>
-                    <span>7/24 müşteri desteği</span>
-                </div>
+                <div class="auth-perk"><i class="fas fa-check"></i><span>Ücretsiz üyelik, hızlı kayıt</span></div>
+                <div class="auth-perk"><i class="fas fa-check"></i><span>Sipariş takibi ve geçmişi</span></div>
+                <div class="auth-perk"><i class="fas fa-check"></i><span>Güvenli ödeme altyapısı</span></div>
+                <div class="auth-perk"><i class="fas fa-check"></i><span>7/24 müşteri desteği</span></div>
             </div>
         </div>
 
@@ -246,32 +278,72 @@
 
             @if (ViewBag.Error != null)
             {
-                <div class="error-msg">
-                    <i class="fas fa-circle-exclamation"></i> @ViewBag.Error
-                </div>
+                <div class="error-msg"><i class="fas fa-circle-exclamation"></i> @ViewBag.Error</div>
             }
 
             @if (ViewBag.Success != null)
             {
-                <div class="success-msg">
-                    <i class="fas fa-circle-check"></i> @ViewBag.Success
-                </div>
+                <div class="success-msg"><i class="fas fa-circle-check"></i> @ViewBag.Success</div>
             }
 
             <form method="post" action="/Auth/Register">
                 @Html.AntiForgeryToken()
+
                 <div class="form-group">
                     <label>Ad Soyad</label>
-                    <input type="text" name="FullName" placeholder="Adınız Soyadınız" required />
+                    <input type="text" name="fullName" placeholder="Adınız Soyadınız" required />
                 </div>
                 <div class="form-group">
                     <label>E-posta</label>
-                    <input type="email" name="Email" placeholder="ornek@gmail.com" required />
+                    <input type="email" name="email" placeholder="ornek@gmail.com" required />
                 </div>
                 <div class="form-group">
                     <label>Şifre</label>
-                    <input type="password" name="Password" placeholder="••••••••" required />
+                    <input type="password" name="password" placeholder="••••••••" required />
                 </div>
+
+                <div class="form-divider"></div>
+                <div class="form-divider-label">Ek Bilgiler (İsteğe Bağlı)</div>
+
+                <div class="form-group">
+                    <label>Telefon</label>
+                    <input type="tel" name="phoneNumber" placeholder="+90 5XX XXX XX XX" />
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Cinsiyet</label>
+                        <select name="gender">
+                            <option value="">Seçiniz</option>
+                            <option value="Erkek">Erkek</option>
+                            <option value="Kadın">Kadın</option>
+                            <option value="Belirtmek istemiyorum">Belirtmek istemiyorum</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Şehir</label>
+                        <select name="city">
+                            <option value="">Seçiniz</option>
+                            <option>Adana</option>
+                            <option>Ankara</option>
+                            <option>Antalya</option>
+                            <option>Bursa</option>
+                            <option>Diyarbakır</option>
+                            <option>Eskişehir</option>
+                            <option>Gaziantep</option>
+                            <option>İstanbul</option>
+                            <option>İzmir</option>
+                            <option>Kayseri</option>
+                            <option>Kocaeli</option>
+                            <option>Konya</option>
+                            <option>Malatya</option>
+                            <option>Mersin</option>
+                            <option>Samsun</option>
+                            <option>Trabzon</option>
+                        </select>
+                    </div>
+                </div>
+
                 <button type="submit" class="btn-submit">Üye Ol →</button>
             </form>
         </div>

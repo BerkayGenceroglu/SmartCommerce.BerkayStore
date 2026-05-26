@@ -2,17 +2,17 @@
     ViewData["Title"] = "Berkay Store - Modern Alışverişin Yeni Adresi";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-
 <style>
-    /* ── HERO ── */
+    /* ── HERO (Premium & Modern E-Commerce Edit) ── */
     .hero {
         position: relative;
-        min-height: 560px;
+        min-height: 580px;
         display: flex;
         align-items: center;
         justify-content: center;
         overflow: hidden;
         padding: 4rem 2rem;
+        background: #0f172a; /* Derin Gece Mavisi Zemin */
     }
 
     .hero-bg {
@@ -21,9 +21,9 @@
         background-image: url('https://images.unsplash.com/photo-1604028289433-26eec51aae02?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
         background-size: cover;
         background-position: center;
-        filter: brightness(0.32);
-        transform: scale(1.05);
-        transition: transform 8s ease;
+        filter: brightness(0.4);
+        transform: scale(1.02);
+        transition: transform 6s cubic-bezier(0.25, 1, 0.5, 1);
     }
 
     .hero:hover .hero-bg {
@@ -33,75 +33,65 @@
     .hero-overlay {
         position: absolute;
         inset: 0;
-        background: linear-gradient(135deg, rgba(10,30,18,0.88) 0%, rgba(26,107,60,0.35) 50%, rgba(10,30,18,0.92) 100%);
+        background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.4) 50%, rgba(15, 23, 42, 0.95) 100%);
     }
 
     .hero-content {
         position: relative;
         z-index: 2;
         text-align: center;
-        max-width: 700px;
+        max-width: 750px;
     }
 
     .hero-eyebrow {
         display: inline-flex;
         align-items: center;
-        gap: 0.6rem;
-        background: rgba(126,218,158,0.12);
-        border: 1px solid rgba(126,218,158,0.25);
-        color: #7eda9e;
-        font-size: 0.72rem;
-        font-weight: 700;
-        letter-spacing: 0.15em;
+        gap: 0.5rem;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        color: #f8fafc;
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
         text-transform: uppercase;
-        padding: 0.4rem 1rem;
-        border-radius: 20px;
-        margin-bottom: 1.5rem;
+        padding: 0.5rem 1.2rem;
+        border-radius: 30px;
+        margin-bottom: 1.8rem;
+        backdrop-filter: blur(8px);
     }
 
-        .hero-eyebrow::before {
-            content: '';
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: #7eda9e;
-            animation: blink 2s infinite;
+        .hero-eyebrow i {
+            color: #3b82f6; /* Soft Mavi İkon */
+            font-size: 0.8rem;
         }
-
-    @@keyframes blink {
-        0%, 100% {
-            opacity: 1;
-        }
-
-        50% {
-            opacity: 0.3;
-        }
-    }
 
     .hero-title {
-        font-family: var(--font-display);
-        font-size: clamp(2.2rem, 5vw, 4rem);
+        font-family: var(--font-display), system-ui, sans-serif;
+        font-size: clamp(2.4rem, 5.5vw, 4.2rem);
         font-weight: 800;
-        color: #fff;
-        line-height: 1.08;
-        margin-bottom: 1rem;
-        letter-spacing: -0.02em;
+        color: #ffffff;
+        line-height: 1.15;
+        margin-bottom: 1.2rem;
+        letter-spacing: -0.03em;
     }
 
         .hero-title .accent {
-            color: #7eda9e;
+            color: #2d9e5f; /* İstediğiniz modern yeşil tonu */
+            background: none;
+            -webkit-background-clip: unset;
+            -webkit-text-fill-color: unset;
         }
 
     .hero-subtitle {
-        font-size: 1.05rem;
-        color: rgba(255,255,255,0.6);
+        font-size: 1.1rem;
+        color: #94a3b8;
         margin-bottom: 2.5rem;
         line-height: 1.6;
+        font-weight: 400;
     }
-
     /* ── SEARCH ── */
     .search-wrap {
-        max-width: 580px;
+        max-width: 620px;
         margin: 0 auto;
         position: relative;
     }
@@ -109,49 +99,49 @@
     .search-box {
         display: flex;
         align-items: center;
-        background: rgba(255,255,255,0.97);
-        border-radius: 14px;
-        padding: 0.5rem 0.5rem 0.5rem 1.25rem;
-        box-shadow: 0 24px 64px rgba(0,0,0,0.35);
-        gap: 0.5rem;
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 0.6rem 0.6rem 0.6rem 1.5rem;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+        gap: 0.75rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
         .search-box input {
             flex: 1;
             border: none;
             outline: none;
-            font-family: var(--font-body);
-            font-size: 0.95rem;
-            color: #1a1a1a;
+            font-family: var(--font-body), system-ui, sans-serif;
+            font-size: 1rem;
+            color: #0f172a;
             background: transparent;
         }
 
             .search-box input::placeholder {
-                color: #bbb;
+                color: #94a3b8;
             }
 
     .btn-search {
-        background: var(--accent);
-        color: #fff;
+        background: #1e293b; /* Tok Lacivert/Siyah Tonu */
+        color: #ffffff;
         border: none;
-        font-family: var(--font-display);
-        font-weight: 700;
-        font-size: 0.85rem;
-        padding: 0.75rem 1.5rem;
-        border-radius: 10px;
+        font-family: var(--font-display), system-ui, sans-serif;
+        font-weight: 600;
+        font-size: 0.9rem;
+        padding: 0.85rem 1.8rem;
+        border-radius: 12px;
         cursor: pointer;
         display: flex;
         align-items: center;
         gap: 0.5rem;
-        transition: opacity 0.2s, transform 0.1s;
+        transition: background 0.2s, transform 0.1s;
         white-space: nowrap;
     }
 
         .btn-search:hover {
-            opacity: 0.88;
+            background: #0f172a;
             transform: translateY(-1px);
         }
-
     /* ── SEARCH DROPDOWN ── */
     .search-results {
         position: absolute;
@@ -253,7 +243,6 @@
         color: #aaa;
         font-size: 0.85rem;
     }
-
     /* ── STATS BAR ── */
     .stats-bar {
         background: var(--surface);
@@ -293,14 +282,12 @@
         height: 20px;
         background: var(--border);
     }
-
     /* ── MAIN ── */
     .home-content {
         max-width: 1400px;
         margin: 0 auto;
         padding: 4rem 2rem;
     }
-
     /* ── KATEGORİ SECTION ── */
     .category-section {
         margin-bottom: 5rem;
@@ -397,7 +384,6 @@
     .category-hero-card:hover .category-hero-btn {
         background: rgba(255,255,255,0.25);
     }
-
     /* ── ÜRÜN GRID ── */
     .category-products {
         display: grid;
@@ -514,14 +500,12 @@
                 background: var(--border);
                 opacity: 1;
             }
-
     /* ── BÖLÜM AYIRICI ── */
     .section-divider {
         height: 1px;
         background: linear-gradient(to right, transparent, var(--border), transparent);
         margin: 0 0 5rem;
     }
-
     /* ── İNDİRİM BANNERLARI ── */
     .discounts-section {
         margin-bottom: 5rem;
@@ -648,7 +632,6 @@
     .discount-card:hover .discount-btn {
         background: #fff;
     }
-
     /* ── SKELETON ── */
     .skeleton {
         background: var(--surface);
@@ -688,32 +671,35 @@
         background: var(--surface2);
         animation: pulse 1.5s ease-in-out infinite;
     }
-
     @@keyframes pulse {
-        0%, 100% {
-            opacity: 1;
-        }
+        0%, 100%
 
-        50% {
-            opacity: 0.6;
-        }
+    {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.6;
+    }
+
     }
 </style>
 
-<!-- HERO -->
 <section class="hero">
     <div class="hero-bg"></div>
     <div class="hero-overlay"></div>
     <div class="hero-content">
-        <div class="hero-eyebrow">200+ Ürün · Hızlı Teslimat · Güvenli Ödeme</div>
-        <h1 class="hero-title">Modern alışverişin<br><span class="accent">yeni adresi</span></h1>
-        <p class="hero-subtitle">Elektronikten modaya, spordan ev yaşamına<br>binlerce ürün tek platformda</p>
+        <div class="hero-eyebrow">
+            <i class="fas fa-sparkles"></i> 200+ Seçkin Ürün · Hızlı Teslimat · Güvenli Ödeme
+        </div>
+        <h1 class="hero-title">Modern alışverişin<br><span class="accent">Yeni Deneyimi</span></h1>
+        <p class="hero-subtitle">Elektronikten modaya, spordan ev yaşamına trend ürünler<br>güvenilir altyapı ve avantajlı fiyatlarla kapınızda.</p>
         <div class="search-wrap">
             <div class="search-box">
-                <i class="fas fa-search" style="color:#ccc;font-size:0.9rem;flex-shrink:0"></i>
-                <input type="text" id="heroSearch" placeholder="Ürün, kategori veya marka ara..." autocomplete="off" />
+                <i class="fas fa-search" style="color:#94a3b8; font-size:1rem; flex-shrink:0"></i>
+                <input type="text" id="heroSearch" placeholder="Aradığınız ürün, kategori veya markayı yazın..." autocomplete="off" />
                 <button class="btn-search" onclick="doSearch()">
-                    <i class="fas fa-search"></i> Ara
+                    <i class="fas fa-search"></i> Mağazada Ara
                 </button>
             </div>
             <div class="search-results" id="searchResults"></div>
@@ -721,7 +707,6 @@
     </div>
 </section>
 
-<!-- STATS BAR -->
 <div class="stats-bar">
     <div class="stats-inner">
         <div class="stat-item"><i class="fas fa-truck"></i><span><strong>500₺</strong> üzeri ücretsiz kargo</span></div>
@@ -734,7 +719,6 @@
     </div>
 </div>
 
-<!-- ANA İÇERİK -->
 <div class="home-content" id="homeContent">
     <div style="display:grid;grid-template-columns:280px 1fr;gap:1.5rem;margin-bottom:2rem">
         <div class="skeleton-hero"></div>
@@ -756,7 +740,6 @@
 @section Scripts {
     <script>
         const token = '@Context.Session.GetString("Token")';
-
         const CATEGORIES = [
             { name: 'Elektronik', icon: 'fa-mobile-screen', image: 'https://images.unsplash.com/photo-1468495244123-6c6c332eeece?w=600&auto=format&fit=crop&q=80', desc: 'Akıllı cihazlar & teknoloji' },
             { name: 'Giyim', icon: 'fa-shirt', image: 'https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=600&auto=format&fit=crop&q=80', desc: 'Moda & sezon trendleri' },
@@ -766,12 +749,11 @@
             { name: 'Kitap', icon: 'fa-book', image: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=600&auto=format&fit=crop&q=80', desc: 'Roman, kişisel gelişim & daha fazlası' },
             { name: 'Evcil Hayvan', icon: 'fa-paw', image: 'https://images.unsplash.com/photo-1450778869180-41d0601e046e?w=600&auto=format&fit=crop&q=80', desc: 'Mama, oyuncak & aksesuar' }
         ];
-
         const DISCOUNTS = [
             {
                 large: true,
                 bg: 'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=900&auto=format&fit=crop&q=80',
-                badge: 'Haftalik Firsat',
+                badge: 'Haftalık Fırsat',
                 title: 'Elektronik\nSezonunda',
                 sub: 'Seçili ürünlerde özel fiyatlar',
                 link: '/Product?category=Elektronik'
@@ -787,13 +769,12 @@
             {
                 large: false,
                 bg: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=700&auto=format&fit=crop&q=80',
-                badge: 'Spor & Saglik',
-                title: 'Aktif Yasam',
+                badge: 'Spor & Sağlık',
+                title: 'Aktif Yaşam',
                 sub: 'Spor ekipmanlarında indirim',
                 link: '/Product?category=Spor'
             }
         ];
-
         const categoryIcons = {
             'Elektronik': 'fa-mobile-screen', 'Giyim': 'fa-shirt', 'Spor': 'fa-dumbbell',
             'Bakım & Kozmetik': 'fa-pump-soap', 'Ev & Yaşam': 'fa-couch', 'Kitap': 'fa-book', 'Evcil Hayvan': 'fa-paw'
@@ -801,19 +782,16 @@
 
         // ── SEARCH ──
         let searchTimeout = null;
-
         document.getElementById('heroSearch').addEventListener('input', function() {
             clearTimeout(searchTimeout);
             const q = this.value.trim();
             if (q.length < 2) { document.getElementById('searchResults').style.display = 'none'; return; }
             searchTimeout = setTimeout(() => liveSearch(q), 300);
         });
-
         document.getElementById('heroSearch').addEventListener('keydown', function(e) {
             if (e.key === 'Enter') doSearch();
             if (e.key === 'Escape') document.getElementById('searchResults').style.display = 'none';
         });
-
         document.addEventListener('click', function(e) {
             if (!e.target.closest('.search-wrap')) document.getElementById('searchResults').style.display = 'none';
         });
@@ -855,8 +833,8 @@
                 <div class="discounts-section">
                     <div class="discounts-header">
                         <div>
-                            <div class="discounts-title">Kampanyalar & Firsatlar</div>
-                            <div class="discounts-subtitle">Sinirli sureli ozel teklifler</div>
+                            <div class="discounts-title">Kampanyalar & Fırsatlar</div>
+                            <div class="discounts-subtitle">Sınırlı süreli özel teklifler</div>
                         </div>
                     </div>
                     <div class="discounts-grid">
@@ -868,7 +846,7 @@
                                     <span class="discount-badge">${d.badge}</span>
                                     <div class="discount-title">${d.title.replace('\n', '<br>')}</div>
                                     <div class="discount-sub">${d.sub}</div>
-                                    <span class="discount-btn">Kesfet <i class="fas fa-arrow-right" style="font-size:0.65rem"></i></span>
+                                    <span class="discount-btn">Keşfet <i class="fas fa-arrow-right" style="font-size:0.65rem"></i></span>
                                 </div>
                             </a>
                         `).join('')}
@@ -883,17 +861,12 @@
             try {
                 const res = await fetch('https://localhost:7136/api/product');
                 const allProducts = await res.json();
-
                 let html = renderDiscountBanners();
-
-
                 CATEGORIES.forEach((cat, idx) => {
                     const catProducts = allProducts
                         .filter(p => p.categoryName === cat.name && p.stock > 0)
                         .slice(0, 5);
-
                     if (catProducts.length === 0) return;
-
                     html += `
                         <div class="category-section">
                             <div class="category-section-header">
@@ -901,10 +874,10 @@
                                     <div class="category-hero-bg" style="background-image:url('${cat.image}')"></div>
                                     <div class="category-hero-overlay"></div>
                                     <div class="category-hero-content">
-                                        <span class="category-hero-tag">${catProducts.length}+ Urun</span>
+                                        <span class="category-hero-tag">${catProducts.length}+ Ürün</span>
                                         <div class="category-hero-name">${cat.name}</div>
                                         <div class="category-hero-count">${cat.desc}</div>
-                                        <span class="category-hero-btn">Tumunu Gor <i class="fas fa-arrow-right" style="font-size:0.65rem"></i></span>
+                                        <span class="category-hero-btn">Tümünü Gör <i class="fas fa-arrow-right" style="font-size:0.65rem"></i></span>
                                     </div>
                                 </a>
                                 <div class="category-products">
@@ -930,17 +903,14 @@
                         </div>
                         <div class="section-divider"></div>
                     `;
-                
                 });
-
                 document.getElementById('homeContent').innerHTML = html;
                 updateCartBadge();
-
             } catch (e) {
                 document.getElementById('homeContent').innerHTML = `
                     <div style="text-align:center;padding:4rem;color:var(--text-muted)">
                         <i class="fas fa-triangle-exclamation" style="font-size:2rem;display:block;margin-bottom:1rem"></i>
-                        Urunler yuklenemedi.
+                        Ürünler yüklenemedi.
                     </div>`;
             }
         }
@@ -954,7 +924,7 @@
                     body: JSON.stringify({ productId, productName, unitPrice, quantity: 1 })
                 });
                 if (res.ok) { showToast(`${productName} sepete eklendi!`); updateCartBadge(); }
-            } catch (e) { showToast('Bir hata olustu.'); }
+            } catch (e) { showToast('Bir hata oluştu.'); }
         }
 
         async function updateCartBadge() {

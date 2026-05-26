@@ -6,5 +6,8 @@ namespace OrderApi.Services
     {
         Task<CouponResponseDto> ApplyCouponAsync(string code, decimal cartTotal);
         Task<CouponResponseDto> GetByCodeAsync(string code);
+        Task<List<CouponResponseDto>> GetAllAsync();
+        Task<CouponResponseDto> CreateAsync(CreateCouponDto dto);
+
     }
 }

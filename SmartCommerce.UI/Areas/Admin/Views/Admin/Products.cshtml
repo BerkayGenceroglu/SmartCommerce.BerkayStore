@@ -1,33 +1,235 @@
-﻿@* @{
-    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+﻿@{
     ViewData["Title"] = "Ürün Yönetimi";
-    var products = ViewBag.Products as List<SmartCommerce.UI.Areas.Admin.Dtos.ProductDto> ?? new();
-    var categories = ViewBag.Categories as List<SmartCommerce.UI.Areas.Admin.Dtos.CategoryDto> ?? new();
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
 }
 
-@section Scripts2 {
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+@section Scripts {
     <script>
         const adminToken = sessionStorage.getItem('adminToken');
-        if (!adminToken) window.location.href = '/Admin/Admin/Login';
+        
 
+        let allProducts = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.Products));
+        let filtered = [...allProducts];
+        let currentPage = 1;
+        const pageSize = 10;
+
+        function renderTable() {
+            const start = (currentPage - 1) * pageSize;
+            const paged = filtered.slice(start, start + pageSize);
+            const tbody = document.getElementById('productTbody');
+
+            if (paged.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--text-muted)">
+                    <i class="fas fa-box-open" style="font-size:1.5rem;display:block;margin-bottom:0.5rem"></i>Ürün bulunamadı</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = paged.map(p => `
+                <tr>
+                    <td>
+                        <div style="display:flex;align-items:center;gap:0.75rem">
+                            <div class="product-thumb">
+                                ${p.ImageUrl ? `<img src="${p.ImageUrl}" onerror="this.style.display='none'" />` : `<i class="fas fa-box"></i>`}
+                            </div>
+                            <div>
+                                <div style="font-weight:600;color:var(--text);font-size:0.85rem">${p.Name}</div>
+                                <div style="font-size:0.72rem;color:var(--text-muted)">${p.Brand || '-'}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td><span class="badge badge-gray">${p.CategoryName}</span></td>
+                    <td style="font-weight:700;color:var(--accent)">${p.Price.toLocaleString('tr-TR')}₺</td>
+                    <td>
+                        <span class="${p.Stock === 0 ? 'badge badge-red' : p.Stock <= 5 ? 'badge badge-yellow' : 'badge badge-green'}">
+                            ${p.Stock === 0 ? 'Tükendi' : p.Stock + ' adet'}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="${p.IsActive ? 'badge badge-green' : 'badge badge-red'}">
+                            ${p.IsActive ? 'Aktif' : 'Pasif'}
+                        </span>
+                    </td>
+                    <td style="font-size:0.78rem;color:var(--text-muted)">${new Date(p.CreatedAt).toLocaleDateString('tr-TR')}</td>
+                    <td>
+                        <div style="display:flex;gap:0.4rem">
+                            <button class="btn-edit" onclick="editProduct('${p.Id}')"><i class="fas fa-pen"></i></button>
+                            <button class="btn-danger" onclick="deleteProduct('${p.Id}', '${p.Name.replace(/'/g, "\\'")}')"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+
+            renderPagination();
+        }
+
+        function renderPagination() {
+            const totalPages = Math.ceil(filtered.length / pageSize);
+            document.getElementById('paginationInfo').textContent =
+                `${filtered.length} üründen ${Math.min((currentPage-1)*pageSize+1, filtered.length)}-${Math.min(currentPage*pageSize, filtered.length)} gösteriliyor`;
+
+            const el = document.getElementById('pagination');
+            if (totalPages <= 1) { el.innerHTML = ''; return; }
+
+            let html = `<button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}><i class="fas fa-chevron-left"></i></button>`;
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === 1 || i === totalPages || (i >= currentPage-1 && i <= currentPage+1)) {
+                    html += `<button class="page-btn ${i===currentPage?'active':''}" onclick="goPage(${i})">${i}</button>`;
+                } else if (i === currentPage-2 || i === currentPage+2) {
+                    html += `<span style="padding:0 0.25rem;color:var(--text-muted)">...</span>`;
+                }
+            }
+            html += `<button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage===totalPages?'disabled':''}><i class="fas fa-chevron-right"></i></button>`;
+            el.innerHTML = html;
+        }
+
+        function goPage(p) {
+            const totalPages = Math.ceil(filtered.length / pageSize);
+            if (p < 1 || p > totalPages) return;
+            currentPage = p;
+            renderTable();
+        }
+
+        function applyFilters() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const category = document.getElementById('categoryFilter').value;
+            const stock = document.getElementById('stockFilter').value;
+
+            filtered = allProducts.filter(p => {
+                const matchSearch = !search || p.Name.toLowerCase().includes(search) || p.Brand?.toLowerCase().includes(search);
+                const matchCat = !category || p.CategoryName === category;
+                const matchStock = !stock ||
+                    (stock === 'instock' && p.Stock > 0) ||
+                    (stock === 'outstock' && p.Stock === 0) ||
+                    (stock === 'low' && p.Stock > 0 && p.Stock <= 5);
+                return matchSearch && matchCat && matchStock;
+            });
+
+            currentPage = 1;
+            renderTable();
+        }
+
+        function editProduct(id) {
+            window.location.href = `/Product/Detail/${id}`;
+        }
+
+        async function deleteProduct(id, name) {
+            if (!confirm(`"${name}" ürününü silmek istediğinize emin misiniz?`)) return;
+            try {
+                const res = await fetch(`https://localhost:7136/api/product/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': 'Bearer ' + adminToken }
+                });
+                if (res.ok) {
+                    allProducts = allProducts.filter(p => p.Id !== id);
+                    filtered = filtered.filter(p => p.Id !== id);
+                    renderTable();
+                    showToast('Ürün silindi.');
+                    updateStats();
+                } else {
+                    showToast('Silme işlemi başarısız.', 'error');
+                }
+            } catch { showToast('Bağlantı hatası.', 'error'); }
+        }
+
+        function updateStats() {
+            document.getElementById('statTotal').textContent = allProducts.length;
+            document.getElementById('statActive').textContent = allProducts.filter(p => p.IsActive).length;
+            document.getElementById('statOut').textContent = allProducts.filter(p => p.Stock === 0).length;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => renderTable());
     </script>
 }
+
 <style>
-    /* ── PAGE-SPECIFIC STYLES ── */
-    .page-toolbar {
+    .page-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        margin-bottom: 2rem;
+    }
+
+    .page-title {
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: var(--text);
+        letter-spacing: -0.01em;
+    }
+
+    .page-sub {
+        font-size: 0.82rem;
+        color: var(--text-muted);
+        margin-top: 0.3rem;
+    }
+
+    .stat-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .stat-mini {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1.1rem 1.5rem;
+        box-shadow: var(--shadow);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .stat-mini-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        flex-shrink: 0;
+    }
+
+    .stat-mini-value {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: var(--text);
+        line-height: 1;
+    }
+
+    .stat-mini-label {
+        font-size: 0.72rem;
+        color: var(--text-muted);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-top: 0.15rem;
+    }
+
+    .table-wrap {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+    }
+
+    .table-toolbar {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        margin-bottom: 1.5rem;
+        padding: 1.1rem 1.5rem;
+        border-bottom: 1px solid var(--border);
+        background: var(--surface2);
         gap: 1rem;
         flex-wrap: wrap;
     }
 
     .toolbar-left {
         display: flex;
-        align-items: center;
         gap: 0.5rem;
+        align-items: center;
         flex-wrap: wrap;
     }
 
@@ -35,10 +237,10 @@
         background: var(--surface);
         border: 1px solid var(--border);
         border-radius: 8px;
-        color: var(--text-dim);
+        color: var(--text);
         font-family: var(--font);
         font-size: 0.82rem;
-        padding: 0.5rem 0.85rem;
+        padding: 0.5rem 0.75rem;
         outline: none;
         cursor: pointer;
         transition: border-color 0.2s;
@@ -48,727 +250,217 @@
             border-color: var(--accent);
         }
 
-    .search-wrap {
-        position: relative;
+    table {
+        width: 100%;
+        border-collapse: collapse;
     }
 
-        .search-wrap i {
-            position: absolute;
-            left: 0.75rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-muted);
-            font-size: 0.8rem;
-            pointer-events: none;
-        }
+    thead th {
+        padding: 0.75rem 1.5rem;
+        text-align: left;
+        font-size: 0.68rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--text-muted);
+        background: var(--surface2);
+        border-bottom: 1px solid var(--border);
+    }
 
-        .search-wrap .search-input {
-            padding-left: 2.25rem;
-        }
-
-    .toggle-switch {
-        display: flex;
-        align-items: center;
-        gap: 0.4rem;
-        cursor: pointer;
-        font-size: 0.82rem;
+    tbody td {
+        padding: 0.9rem 1.5rem;
+        border-bottom: 1px solid var(--border);
+        vertical-align: middle;
+        font-size: 0.85rem;
         color: var(--text-dim);
-        user-select: none;
     }
 
-    .switch {
-        width: 36px;
-        height: 20px;
-        background: var(--border);
-        border-radius: 20px;
-        position: relative;
-        transition: background 0.2s;
+    tbody tr:last-child td {
+        border-bottom: none;
     }
 
-        .switch::after {
-            content: '';
-            width: 14px;
-            height: 14px;
-            background: #fff;
-            border-radius: 50%;
-            position: absolute;
-            top: 3px;
-            left: 3px;
-            transition: transform 0.2s;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-        }
-
-    input[type=checkbox]:checked + .switch {
-        background: var(--success);
+    tbody tr:hover td {
+        background: #fafbff;
     }
 
-        input[type=checkbox]:checked + .switch::after {
-            transform: translateX(16px);
-        }
-
-    .toggle-cb {
-        display: none;
-    }
-
-    /* ── TABLE ENHANCEMENTS ── */
-    .price-cell {
-        font-weight: 700;
-        color: var(--text);
-        font-variant-numeric: tabular-nums;
-    }
-
-    .stock-cell {
-        font-variant-numeric: tabular-nums;
-    }
-
-    .stock-low {
-        color: var(--danger);
-        font-weight: 700;
-    }
-
-    .action-cell {
-        display: flex;
-        align-items: center;
-        gap: 0.4rem;
-    }
-
-    .btn-icon {
-        width: 32px;
-        height: 32px;
-        border-radius: 7px;
+    .product-thumb {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        overflow: hidden;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 0.78rem;
-        cursor: pointer;
-        border: none;
-        transition: background 0.15s, transform 0.1s;
+        font-size: 1rem;
+        color: var(--text-muted);
+        flex-shrink: 0;
     }
 
-        .btn-icon:active {
-            transform: scale(0.93);
+        .product-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
-    .btn-icon-edit {
+    .btn-edit {
         background: var(--accent-bg);
         color: var(--accent);
         border: 1px solid rgba(66,122,181,0.2);
+        border-radius: 6px;
+        padding: 0.4rem 0.6rem;
+        cursor: pointer;
+        font-size: 0.78rem;
+        transition: background 0.15s;
     }
 
-        .btn-icon-edit:hover {
+        .btn-edit:hover {
             background: rgba(66,122,181,0.15);
         }
 
-    .btn-icon-del {
+    .btn-danger {
         background: #fff5f5;
         color: var(--danger);
         border: 1px solid #fed7d7;
+        border-radius: 6px;
+        padding: 0.4rem 0.6rem;
+        cursor: pointer;
+        font-size: 0.78rem;
+        transition: background 0.15s;
     }
 
-        .btn-icon-del:hover {
+        .btn-danger:hover {
             background: #ffe4e4;
         }
 
-    /* ── IMAGE UPLOAD PREVIEW ── */
-    .img-upload-area {
-        border: 2px dashed var(--border);
-        border-radius: 10px;
-        padding: 1.25rem;
-        text-align: center;
-        cursor: pointer;
-        transition: border-color 0.2s, background 0.2s;
+    .table-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem 1.5rem;
+        border-top: 1px solid var(--border);
         background: var(--surface2);
+        font-size: 0.78rem;
+        color: var(--text-muted);
     }
 
-        .img-upload-area:hover {
-            border-color: var(--accent);
-            background: var(--accent-bg);
-        }
-
-        .img-upload-area i {
-            font-size: 1.5rem;
-            color: var(--text-muted);
-            display: block;
-            margin-bottom: 0.4rem;
-        }
-
-        .img-upload-area span {
-            font-size: 0.78rem;
-            color: var(--text-muted);
-        }
-
-    #imgPreview {
-        display: none;
-        width: 100%;
-        max-height: 120px;
-        object-fit: contain;
-        border-radius: 8px;
-        margin-top: 0.75rem;
+    .pagination {
+        display: flex;
+        gap: 0.3rem;
+        align-items: center;
     }
 
-    /* ── CONFIRM MODAL ── */
-    .confirm-modal {
-        max-width: 380px;
-        text-align: center;
-    }
-
-    .confirm-icon {
-        width: 56px;
-        height: 56px;
-        background: rgba(229,62,62,0.1);
-        border-radius: 50%;
+    .page-btn {
+        width: 30px;
+        height: 30px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        color: var(--text-dim);
+        font-size: 0.78rem;
+        cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.4rem;
-        color: var(--danger);
-        margin: 0 auto 1rem;
+        transition: all 0.15s;
     }
 
-    .confirm-title {
-        font-size: 1rem;
-        font-weight: 700;
-        color: var(--text);
-        margin-bottom: 0.4rem;
-    }
-
-    .confirm-text {
-        font-size: 0.85rem;
-        color: var(--text-muted);
-        margin-bottom: 0;
-    }
-
-    /* ── STATS ROW ── */
-    .stat-trend {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.25rem;
-        font-size: 0.72rem;
-        font-weight: 600;
-        color: var(--success);
-        margin-top: 0.2rem;
-    }
-
-    /* ── EMPTY STATE ── */
-    .empty-state {
-        padding: 4rem 2rem;
-        text-align: center;
-    }
-
-        .empty-state .empty-icon {
-            width: 64px;
-            height: 64px;
-            background: var(--surface2);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            color: var(--text-muted);
-            margin: 0 auto 1rem;
+        .page-btn:hover:not(:disabled) {
+            background: var(--accent-bg);
+            color: var(--accent);
+            border-color: rgba(66,122,181,0.3);
         }
 
-        .empty-state h4 {
-            font-size: 0.92rem;
-            font-weight: 700;
-            color: var(--text);
-            margin-bottom: 0.35rem;
+        .page-btn.active {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
         }
 
-        .empty-state p {
-            font-size: 0.82rem;
-            color: var(--text-muted);
-        }
-
-    /* ── CATEGORY PILL ── */
-    .cat-pill {
-        display: inline-block;
-        background: var(--accent-bg);
-        color: var(--accent);
-        border: 1px solid rgba(66,122,181,0.15);
-        border-radius: 6px;
-        font-size: 0.72rem;
-        font-weight: 600;
-        padding: 0.18rem 0.55rem;
-    }
-
-    /* ── RESULTS COUNT ── */
-    .results-info {
-        font-size: 0.8rem;
-        color: var(--text-muted);
-    }
-
-    #tableBody tr {
-        transition: opacity 0.15s;
-    }
-
-        #tableBody tr.hidden-row {
-            display: none;
+        .page-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
         }
 </style>
 
-<!-- ── STAT CARDS ── -->
-<div class="stat-cards">
-    <div class="stat-card">
-        <div class="stat-card-header">
-            <span class="stat-card-label">Toplam Ürün</span>
-            <div class="stat-card-icon icon-blue"><i class="fas fa-box"></i></div>
-        </div>
-        <div class="stat-card-value">@ViewBag.TotalProducts</div>
-        <div class="stat-card-sub">Kayıtlı ürün sayısı</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-card-header">
-            <span class="stat-card-label">Aktif Ürünler</span>
-            <div class="stat-card-icon icon-green"><i class="fas fa-check-circle"></i></div>
-        </div>
-        <div class="stat-card-value">@ViewBag.ActiveProducts</div>
-        <div class="stat-card-sub">Satışa açık</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-card-header">
-            <span class="stat-card-label">Stok Yok</span>
-            <div class="stat-card-icon icon-red"><i class="fas fa-exclamation-triangle"></i></div>
-        </div>
-        <div class="stat-card-value">@ViewBag.OutOfStock</div>
-        <div class="stat-card-sub">Stokta olmayan ürünler</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-card-header">
-            <span class="stat-card-label">Kategoriler</span>
-            <div class="stat-card-icon icon-yellow"><i class="fas fa-tag"></i></div>
-        </div>
-        <div class="stat-card-value">@categories.Count</div>
-        <div class="stat-card-sub">Aktif kategori</div>
+<div class="page-header">
+    <div>
+        <div class="page-title">Ürün Yönetimi</div>
+        <div class="page-sub">Tüm ürünleri görüntüleyin ve yönetin</div>
     </div>
 </div>
 
-<!-- ── TOOLBAR ── -->
-<div class="page-toolbar">
-    <div class="toolbar-left">
-        <div class="search-wrap">
-            <i class="fas fa-search"></i>
-            <input type="text" class="search-input" id="searchInput" placeholder="Ürün ara..." oninput="filterTable()" />
-        </div>
-        <select class="filter-select" id="catFilter" onchange="filterTable()">
-            <option value="">Tüm Kategoriler</option>
-            @foreach (var cat in categories)
-            {
-                <option value="@cat.Name">@cat.Name</option>
-            }
-        </select>
-        <select class="filter-select" id="statusFilter" onchange="filterTable()">
-            <option value="">Tüm Durumlar</option>
-            <option value="active">Aktif</option>
-            <option value="inactive">Pasif</option>
-            <option value="outofstock">Stok Yok</option>
-        </select>
-    </div>
-    <button class="btn-primary" onclick="openAddModal()">
-        <i class="fas fa-plus"></i> Yeni Ürün
-    </button>
-</div>
-
-<!-- ── TABLE ── -->
-<div class="table-wrap">
-    <div class="table-header">
+<div class="stat-row">
+    <div class="stat-mini">
+        <div class="stat-mini-icon icon-blue"><i class="fas fa-box"></i></div>
         <div>
-            <div class="table-title">Ürün Listesi</div>
-            <div class="results-info" id="resultsInfo">@products.Count ürün listeleniyor</div>
+            <div class="stat-mini-value" id="statTotal">@ViewBag.TotalProducts</div>
+            <div class="stat-mini-label">Toplam Ürün</div>
         </div>
     </div>
-
-    @if (!products.Any())
-    {
-        <div class="empty-state">
-            <div class="empty-icon"><i class="fas fa-box-open"></i></div>
-            <h4>Henüz ürün yok</h4>
-            <p>Yeni ürün eklemek için yukarıdaki butonu kullanın.</p>
+    <div class="stat-mini">
+        <div class="stat-mini-icon icon-green"><i class="fas fa-circle-check"></i></div>
+        <div>
+            <div class="stat-mini-value" id="statActive">@ViewBag.ActiveProducts</div>
+            <div class="stat-mini-label">Aktif Ürün</div>
         </div>
-    }
-    else
-    {
-        <table>
-            <thead>
-                <tr>
-                    <th>Ürün</th>
-                    <th>Kategori</th>
-                    <th>Marka</th>
-                    <th>Fiyat</th>
-                    <th>Stok</th>
-                    <th>Durum</th>
-                    <th>Eklenme</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody id="tableBody">
-                @foreach (var p in products)
-                {
-                    <tr data-id="@p.Id"
-                        data-name="@p.Name.ToLower()"
-                        data-brand="@p.Brand.ToLower()"
-                        data-category="@p.CategoryName"
-                        data-active="@(p.IsActive ? "active" : "inactive")"
-                        data-stock="@p.Stock">
-                        <td>
-                            <div class="product-cell">
-                                <div class="product-thumb">
-                                    @if (!string.IsNullOrEmpty(p.ImageUrl))
-                                    {
-                                        <img src="@p.ImageUrl" alt="@p.Name" onerror="this.style.display='none'" />
-                                    }
-                                    else
-                                    {
-                                        <i class="fas fa-image"></i>
-                                    }
-                                </div>
-                                <span class="td-name">@p.Name</span>
-                            </div>
-                        </td>
-                        <td><span class="cat-pill">@p.CategoryName</span></td>
-                        <td>@p.Brand</td>
-                        <td class="price-cell">₺@p.Price.ToString("N2")</td>
-                        <td class="stock-cell @(p.Stock == 0 ? "stock-low" : "")">
-                            @if (p.Stock == 0)
-                            {
-                                <span class="badge badge-red"><i class="fas fa-circle" style="font-size:0.5rem"></i> Tükendi</span>
-                            }
-                            else if (p.Stock <= 5)
-                            {
-                                <span class="badge badge-yellow">@p.Stock adet</span>
-                            }
-                            else
-                            {
-                                <span>@p.Stock</span>
-                            }
-                        </td>
-                        <td>
-                            @if (p.IsActive)
-                            {
-                                <span class="badge badge-green"><i class="fas fa-circle" style="font-size:0.5rem"></i> Aktif</span>
-                            }
-                            else
-                            {
-                                <span class="badge badge-gray"><i class="fas fa-circle" style="font-size:0.5rem"></i> Pasif</span>
-                            }
-                        </td>
-                        <td>@p.CreatedAt.ToString("dd.MM.yyyy")</td>
-                        <td>
-                            <div class="action-cell">
-                                <button class="btn-icon btn-icon-edit" title="Düzenle"
-                                        onclick="openEditModal('@p.Id','@p.Name','@p.Brand','@p.CategoryName',@p.Price,@p.Stock,@p.IsActive.ToString().ToLower(),'@p.ImageUrl')">
-                                    <i class="fas fa-pen"></i>
-                                </button>
-                                <button class="btn-icon btn-icon-del" title="Sil"
-                                        onclick="confirmDelete('@p.Id','@p.Name')">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    }
+    </div>
+    <div class="stat-mini">
+        <div class="stat-mini-icon icon-red"><i class="fas fa-ban"></i></div>
+        <div>
+            <div class="stat-mini-value" id="statOut">@ViewBag.OutOfStock</div>
+            <div class="stat-mini-label">Tükenen Ürün</div>
+        </div>
+    </div>
 </div>
 
-<!-- ══════════════════════════════════════
-     ADD / EDIT MODAL
-══════════════════════════════════════ -->
-<div class="modal-overlay" id="productModal">
-    <div class="modal">
-        <div class="modal-header">
-            <div class="modal-title" id="modalTitle">Yeni Ürün Ekle</div>
-            <button class="modal-close" onclick="closeModal('productModal')"><i class="fas fa-xmark"></i></button>
-        </div>
-
-        <div class="form-group">
-            <label class="form-label">Ürün Adı</label>
-            <input type="text" class="form-input" id="fName" placeholder="Ürün adını girin" />
-        </div>
-
-        <div class="form-row">
-            <div class="form-group">
-                <label class="form-label">Marka</label>
-                <input type="text" class="form-input" id="fBrand" placeholder="Marka" />
-            </div>
-            <div class="form-group">
-                <label class="form-label">Kategori</label>
-                <select class="form-select" id="fCategory">
-                    <option value="">Kategori Seçin</option>
-                    @foreach (var cat in categories)
+<div class="table-wrap">
+    <div class="table-toolbar">
+        <div class="toolbar-left">
+            <input type="text" id="searchInput" class="search-input" placeholder="Ürün veya marka ara..." oninput="applyFilters()" style="width:220px" />
+            <select id="categoryFilter" class="filter-select" onchange="applyFilters()">
+                <option value="">Tüm Kategoriler</option>
+                @if (ViewBag.Categories != null)
+                {
+                    foreach (var cat in ViewBag.Categories)
                     {
                         <option value="@cat.Name">@cat.Name</option>
                     }
-                </select>
-            </div>
-        </div>
-
-        <div class="form-row">
-            <div class="form-group">
-                <label class="form-label">Fiyat (₺)</label>
-                <input type="number" class="form-input" id="fPrice" placeholder="0.00" min="0" step="0.01" />
-            </div>
-            <div class="form-group">
-                <label class="form-label">Stok</label>
-                <input type="number" class="form-input" id="fStock" placeholder="0" min="0" />
-            </div>
-        </div>
-
-        <div class="form-group">
-            <label class="form-label">Görsel URL</label>
-            <input type="text" class="form-input" id="fImageUrl" placeholder="https://..." oninput="previewImage(this.value)" />
-            <img id="imgPreview" src="" alt="Önizleme" />
-        </div>
-
-        <div class="form-group" style="display:flex;align-items:center;gap:0.75rem;">
-            <input type="checkbox" class="toggle-cb" id="fIsActive" checked />
-            <label class="toggle-switch" for="fIsActive">
-                <span class="switch"></span>
-                Aktif olarak yayınla
-            </label>
-        </div>
-
-        <input type="hidden" id="fProductId" />
-
-        <div class="modal-actions">
-            <button class="btn-secondary" onclick="closeModal('productModal')">İptal</button>
-            <button class="btn-primary" id="saveBtn" onclick="saveProduct()">
-                <i class="fas fa-check"></i> Kaydet
-            </button>
+                }
+            </select>
+            <select id="stockFilter" class="filter-select" onchange="applyFilters()">
+                <option value="">Tüm Stok</option>
+                <option value="instock">Stokta Var</option>
+                <option value="low">Az Kaldı (≤5)</option>
+                <option value="outstock">Tükendi</option>
+            </select>
         </div>
     </div>
-</div>
 
-<!-- ══════════════════════════════════════
-     DELETE CONFIRM MODAL
-══════════════════════════════════════ -->
-<div class="modal-overlay" id="deleteModal">
-    <div class="modal confirm-modal">
-        <div style="padding-top:0.5rem">
-            <div class="confirm-icon"><i class="fas fa-trash"></i></div>
-            <div class="confirm-title">Ürünü Sil</div>
-            <p class="confirm-text"><strong id="deleteProductName"></strong> adlı ürünü silmek istediğinize emin misiniz? Bu işlem geri alınamaz.</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Ürün</th>
+                <th>Kategori</th>
+                <th>Fiyat</th>
+                <th>Stok</th>
+                <th>Durum</th>
+                <th>Tarih</th>
+                <th>İşlem</th>
+            </tr>
+        </thead>
+        <tbody id="productTbody">
+            <tr>
+                <td colspan="7" style="text-align:center;padding:2rem;color:var(--text-muted)">
+                    <i class="fas fa-spinner fa-spin"></i> Yükleniyor...
+                </td>
+            </tr>
+        </tbody>
+    </table>
 
-            <div class="modal-actions">
-                <button class="btn-secondary" onclick="closeModal('deleteModal')">Vazgeç</button>
-                <button class="btn-danger" id="confirmDeleteBtn" onclick="executeDelete()">
-                    <i class="fas fa-trash"></i> Evet, Sil
-                </button>
-            </div>
-        </div>
+    <div class="table-footer">
+        <span id="paginationInfo"></span>
+        <div class="pagination" id="pagination"></div>
     </div>
 </div>
-
-@section Scripts {
-    <script>
-        // ── TOKEN KONTROLÜ (Dashboard ile aynı pattern) ──
-        const adminToken = sessionStorage.getItem('adminToken');
-        if (!adminToken) window.location.href = '/Admin/Login';
-
-        const API_BASE = 'https://localhost:7136/api';
-        let deleteTargetId = null;
-        let editMode = false;
-
-        /* ─── FILTER ─── */
-        function filterTable() {
-            const q = document.getElementById('searchInput').value.toLowerCase().trim();
-            const cat = document.getElementById('catFilter').value;
-            const status = document.getElementById('statusFilter').value;
-            const rows = document.querySelectorAll('#tableBody tr');
-            let visible = 0;
-
-            rows.forEach(row => {
-                const name = row.dataset.name || '';
-                const brand = row.dataset.brand || '';
-                const rowCat = row.dataset.category || '';
-                const rowActive = row.dataset.active || '';
-                const rowStock = parseInt(row.dataset.stock || '0');
-
-                const matchQ = !q || name.includes(q) || brand.includes(q);
-                const matchCat = !cat || rowCat === cat;
-                let matchStatus = true;
-                if (status === 'active') matchStatus = rowActive === 'active';
-                else if (status === 'inactive') matchStatus = rowActive === 'inactive';
-                else if (status === 'outofstock') matchStatus = rowStock === 0;
-
-                if (matchQ && matchCat && matchStatus) {
-                    row.classList.remove('hidden-row');
-                    visible++;
-                } else {
-                    row.classList.add('hidden-row');
-                }
-            });
-
-            const info = document.getElementById('resultsInfo');
-            if (info) {
-                const total = rows.length;
-                info.textContent = visible === total
-                    ? `${total} ürün listeleniyor`
-                    : `${visible} / ${total} ürün gösteriliyor`;
-            }
-        }
-
-        /* ─── MODALS ─── */
-        function openAddModal() {
-            editMode = false;
-            document.getElementById('modalTitle').textContent = 'Yeni Ürün Ekle';
-            document.getElementById('saveBtn').innerHTML = '<i class="fas fa-plus"></i> Ekle';
-            clearForm();
-            openModal('productModal');
-        }
-
-        function openEditModal(id, name, brand, category, price, stock, isActive, imageUrl) {
-            editMode = true;
-            document.getElementById('modalTitle').textContent = 'Ürünü Düzenle';
-            document.getElementById('saveBtn').innerHTML = '<i class="fas fa-check"></i> Güncelle';
-
-            document.getElementById('fProductId').value = id;
-            document.getElementById('fName').value = name;
-            document.getElementById('fBrand').value = brand;
-            document.getElementById('fPrice').value = price;
-            document.getElementById('fStock').value = stock;
-            document.getElementById('fIsActive').checked = isActive === 'true' || isActive === true;
-
-            const catEl = document.getElementById('fCategory');
-            for (let i = 0; i < catEl.options.length; i++) {
-                if (catEl.options[i].value === category) { catEl.selectedIndex = i; break; }
-            }
-
-            document.getElementById('fImageUrl').value = imageUrl || '';
-            previewImage(imageUrl || '');
-
-            openModal('productModal');
-        }
-
-        function confirmDelete(id, name) {
-            deleteTargetId = id;
-            document.getElementById('deleteProductName').textContent = name;
-            openModal('deleteModal');
-        }
-
-        function openModal(id) {
-            document.getElementById(id).classList.add('open');
-        }
-
-        function closeModal(id) {
-            document.getElementById(id).classList.remove('open');
-        }
-
-        function clearForm() {
-            ['fProductId','fName','fBrand','fPrice','fStock','fImageUrl'].forEach(id => {
-                document.getElementById(id).value = '';
-            });
-            document.getElementById('fCategory').selectedIndex = 0;
-            document.getElementById('fIsActive').checked = true;
-            document.getElementById('imgPreview').style.display = 'none';
-        }
-
-        function previewImage(url) {
-            const img = document.getElementById('imgPreview');
-            if (url && url.startsWith('http')) {
-                img.src = url;
-                img.style.display = 'block';
-                img.onerror = () => { img.style.display = 'none'; };
-            } else {
-                img.style.display = 'none';
-            }
-        }
-
-        /* ─── SAVE (ADD / EDIT) ─── */
-        async function saveProduct() {
-            const token = adminToken;
-            const name = document.getElementById('fName').value.trim();
-            const brand = document.getElementById('fBrand').value.trim();
-            const category = document.getElementById('fCategory').value;
-            const price = parseFloat(document.getElementById('fPrice').value);
-            const stock = parseInt(document.getElementById('fStock').value);
-            const isActive = document.getElementById('fIsActive').checked;
-            const imageUrl = document.getElementById('fImageUrl').value.trim();
-
-            if (!name || !brand || !category || isNaN(price) || isNaN(stock)) {
-                showToast('Lütfen tüm zorunlu alanları doldurun.', 'error');
-                return;
-            }
-
-            const payload = { name, brand, categoryName: category, price, stock, isActive, imageUrl: imageUrl || null };
-
-            try {
-                let res;
-                if (editMode) {
-                    const id = document.getElementById('fProductId').value;
-                    res = await fetch(`${API_BASE}/product/${id}`, {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                        body: JSON.stringify({ ...payload, id })
-                    });
-                } else {
-                    res = await fetch(`${API_BASE}/product`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                        body: JSON.stringify(payload)
-                    });
-                }
-
-                if (res.ok) {
-                    showToast(editMode ? 'Ürün başarıyla güncellendi.' : 'Ürün başarıyla eklendi.', 'success');
-                    closeModal('productModal');
-                    setTimeout(() => location.reload(), 800);
-                } else {
-                    showToast('İşlem başarısız oldu. Tekrar deneyin.', 'error');
-                }
-            } catch {
-                showToast('Sunucuya bağlanılamadı.', 'error');
-            }
-        }
-
-        /* ─── DELETE ─── */
-        async function executeDelete() {
-            if (!deleteTargetId) return;
-            const token = adminToken;
-
-            try {
-                const res = await fetch(`${API_BASE}/product/${deleteTargetId}`, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-
-                if (res.ok) {
-                    showToast('Ürün silindi.', 'success');
-                    closeModal('deleteModal');
-
-                    // DOM'dan satırı kaldır
-                    const row = document.querySelector(`#tableBody tr[data-id="${deleteTargetId}"]`);
-                    if (row) {
-                        row.style.opacity = '0';
-                        row.style.transition = 'opacity 0.3s';
-                        setTimeout(() => { row.remove(); filterTable(); }, 300);
-                    }
-                } else {
-                    showToast('Silme işlemi başarısız.', 'error');
-                }
-            } catch {
-                showToast('Sunucuya bağlanılamadı.', 'error');
-            }
-
-            deleteTargetId = null;
-        }
-
-        /* ─── ESC TO CLOSE ─── */
-        document.addEventListener('keydown', e => {
-            if (e.key === 'Escape') {
-                document.querySelectorAll('.modal-overlay.open')
-                        .forEach(m => m.classList.remove('open'));
-            }
-        });
-
-        /* ─── BACKDROP CLICK TO CLOSE ─── */
-        document.querySelectorAll('.modal-overlay').forEach(overlay => {
-            overlay.addEventListener('click', e => {
-                if (e.target === overlay) overlay.classList.remove('open');
-            });
-        });
-    </script>
-}
- *@

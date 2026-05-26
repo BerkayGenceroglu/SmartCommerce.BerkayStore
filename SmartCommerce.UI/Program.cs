@@ -26,6 +26,8 @@ builder.Services.AddScoped<ICargoService, CargoService>();
 builder.Services.AddScoped<IAdminOrderService, AdminOrderService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICouponService, CouponService>();
+builder.Services.AddScoped<IInvoiceService, InvoiceService>();
+builder.Services.AddScoped<IReviewService, ReviewService>();
 
 
 // HttpClient

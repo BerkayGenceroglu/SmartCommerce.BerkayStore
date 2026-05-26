@@ -142,7 +142,8 @@ public class OrderService : IOrderService
                     ProductId = i.ProductId,
                     ProductName = i.ProductName,
                     UnitPrice = i.UnitPrice,
-                    Quantity = i.Quantity
+                    Quantity = i.Quantity,
+                    
                 }).ToList()
             })
             .ToListAsync();

@@ -1,0 +1,511 @@
+﻿@{
+    ViewData["Title"] = "Sipariş Yönetimi";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+@section Scripts {
+    <script>
+
+        let allOrders = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.Orders));
+        let filtered = [...allOrders];
+        let currentPage = 1;
+        const pageSize = 10;
+
+        function renderTable() {
+            const start = (currentPage - 1) * pageSize;
+            const paged = filtered.slice(start, start + pageSize);
+            const tbody = document.getElementById('orderTbody');
+
+            if (paged.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--text-muted)">
+                    <i class="fas fa-shopping-bag" style="font-size:1.5rem;display:block;margin-bottom:0.5rem"></i>Sipariş bulunamadı</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = paged.map(o => `
+                <tr>
+                    <td>
+                        <div style="font-weight:700;color:var(--text);font-family:monospace;font-size:0.85rem">#${o.Id.substring(0,8).toUpperCase()}</div>
+                        <div style="font-size:0.72rem;color:var(--text-muted);margin-top:0.1rem">${new Date(o.CreatedAt).toLocaleDateString('tr-TR', {day:'numeric',month:'long',year:'numeric'})}</div>
+                    </td>
+                    <td style="font-size:0.78rem;color:var(--text-dim);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${o.Address}</td>
+                    <td>
+                        <div style="font-size:0.78rem;color:var(--text-muted)">${o.Items?.length || 0} kalem</div>
+                        <div style="font-size:0.72rem;color:var(--text-muted)">${o.Items?.map(i => i.ProductName).slice(0,2).join(', ')}${o.Items?.length > 2 ? '...' : ''}</div>
+                    </td>
+                    <td style="font-weight:700;color:var(--accent);font-size:0.95rem">${o.TotalAmount.toLocaleString('tr-TR')}₺</td>
+                    <td>
+                        <span class="badge ${o.Status === 1 ? 'badge-green' : o.Status === 2 ? 'badge-red' : 'badge-yellow'}">
+                            ${o.Status === 0 ? 'Bekliyor' : o.Status === 1 ? 'Tamamlandı' : 'İptal'}
+                        </span>
+                    </td>
+                    <td>
+                        <button class="btn-edit" onclick="showDetail('${o.Id}')"><i class="fas fa-eye"></i> Detay</button>
+                    </td>
+                </tr>
+            `).join('');
+
+            renderPagination();
+        }
+
+        function renderPagination() {
+            const totalPages = Math.ceil(filtered.length / pageSize);
+            document.getElementById('paginationInfo').textContent =
+                `${filtered.length} siparişten ${Math.min((currentPage-1)*pageSize+1, filtered.length)}-${Math.min(currentPage*pageSize, filtered.length)} gösteriliyor`;
+
+            const el = document.getElementById('pagination');
+            if (totalPages <= 1) { el.innerHTML = ''; return; }
+
+            let html = `<button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}><i class="fas fa-chevron-left"></i></button>`;
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === 1 || i === totalPages || (i >= currentPage-1 && i <= currentPage+1)) {
+                    html += `<button class="page-btn ${i===currentPage?'active':''}" onclick="goPage(${i})">${i}</button>`;
+                } else if (i === currentPage-2 || i === currentPage+2) {
+                    html += `<span style="padding:0 0.25rem;color:var(--text-muted)">...</span>`;
+                }
+            }
+            html += `<button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage===totalPages?'disabled':''}><i class="fas fa-chevron-right"></i></button>`;
+            el.innerHTML = html;
+        }
+
+        function goPage(p) {
+            const totalPages = Math.ceil(filtered.length / pageSize);
+            if (p < 1 || p > totalPages) return;
+            currentPage = p;
+            renderTable();
+        }
+
+        function applyFilters() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const status = document.getElementById('statusFilter').value;
+
+            filtered = allOrders.filter(o => {
+                const matchSearch = !search || o.Id.toLowerCase().includes(search) || o.Address.toLowerCase().includes(search);
+                const matchStatus = status === '' || o.Status === parseInt(status);
+                return matchSearch && matchStatus;
+            });
+
+            currentPage = 1;
+            renderTable();
+        }
+
+        function showDetail(orderId) {
+            const order = allOrders.find(o => o.Id === orderId);
+            if (!order) return;
+
+            document.getElementById('detailOrderId').textContent = '#' + order.Id.substring(0,8).toUpperCase();
+            document.getElementById('detailDate').textContent = new Date(order.CreatedAt).toLocaleString('tr-TR');
+            document.getElementById('detailAddress').textContent = order.Address;
+            document.getElementById('detailTotal').textContent = order.TotalAmount.toLocaleString('tr-TR') + '₺';
+            document.getElementById('detailStatus').innerHTML = `<span class="badge ${order.Status === 1 ? 'badge-green' : order.Status === 2 ? 'badge-red' : 'badge-yellow'}">
+                ${order.Status === 0 ? 'Bekliyor' : order.Status === 1 ? 'Tamamlandı' : 'İptal'}</span>`;
+
+            document.getElementById('detailItems').innerHTML = (order.Items || []).map(i => `
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:0.65rem 0;border-bottom:1px solid var(--border)">
+                    <div>
+                        <div style="font-size:0.85rem;font-weight:600;color:var(--text)">${i.ProductName}</div>
+                        <div style="font-size:0.72rem;color:var(--text-muted)">${i.Quantity} adet × ${i.UnitPrice.toLocaleString('tr-TR')}₺</div>
+                    </div>
+                    <div style="font-weight:700;color:var(--accent)">${(i.Quantity * i.UnitPrice).toLocaleString('tr-TR')}₺</div>
+                </div>
+            `).join('');
+
+            document.getElementById('detailModal').classList.add('open');
+        }
+
+        function closeModal() {
+            document.getElementById('detailModal').classList.remove('open');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => renderTable());
+    </script>
+}
+
+<style>
+    .page-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        margin-bottom: 2rem;
+    }
+
+    .page-title {
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: var(--text);
+        letter-spacing: -0.01em;
+    }
+
+    .page-sub {
+        font-size: 0.82rem;
+        color: var(--text-muted);
+        margin-top: 0.3rem;
+    }
+
+    .stat-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .stat-mini {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1.1rem 1.5rem;
+        box-shadow: var(--shadow);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .stat-mini-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        flex-shrink: 0;
+    }
+
+    .stat-mini-value {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: var(--text);
+        line-height: 1;
+    }
+
+    .stat-mini-label {
+        font-size: 0.72rem;
+        color: var(--text-muted);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-top: 0.15rem;
+    }
+
+    .table-wrap {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+    }
+
+    .table-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1.1rem 1.5rem;
+        border-bottom: 1px solid var(--border);
+        background: var(--surface2);
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .toolbar-left {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+    }
+
+    .filter-select {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        color: var(--text);
+        font-family: var(--font);
+        font-size: 0.82rem;
+        padding: 0.5rem 0.75rem;
+        outline: none;
+        cursor: pointer;
+    }
+
+        .filter-select:focus {
+            border-color: var(--accent);
+        }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    thead th {
+        padding: 0.75rem 1.5rem;
+        text-align: left;
+        font-size: 0.68rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--text-muted);
+        background: var(--surface2);
+        border-bottom: 1px solid var(--border);
+    }
+
+    tbody td {
+        padding: 0.9rem 1.5rem;
+        border-bottom: 1px solid var(--border);
+        vertical-align: middle;
+        font-size: 0.85rem;
+        color: var(--text-dim);
+    }
+
+    tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    tbody tr:hover td {
+        background: #fafbff;
+    }
+
+    .btn-edit {
+        background: var(--accent-bg);
+        color: var(--accent);
+        border: 1px solid rgba(66,122,181,0.2);
+        border-radius: 6px;
+        padding: 0.4rem 0.75rem;
+        cursor: pointer;
+        font-size: 0.78rem;
+        transition: background 0.15s;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+    }
+
+        .btn-edit:hover {
+            background: rgba(66,122,181,0.15);
+        }
+
+    .table-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem 1.5rem;
+        border-top: 1px solid var(--border);
+        background: var(--surface2);
+        font-size: 0.78rem;
+        color: var(--text-muted);
+    }
+
+    .pagination {
+        display: flex;
+        gap: 0.3rem;
+        align-items: center;
+    }
+
+    .page-btn {
+        width: 30px;
+        height: 30px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        color: var(--text-dim);
+        font-size: 0.78rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.15s;
+    }
+
+        .page-btn:hover:not(:disabled) {
+            background: var(--accent-bg);
+            color: var(--accent);
+            border-color: rgba(66,122,181,0.3);
+        }
+
+        .page-btn.active {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+        }
+
+        .page-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+    .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.35);
+        z-index: 200;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(3px);
+    }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
+    .modal {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        width: 100%;
+        max-width: 500px;
+        max-height: 90vh;
+        overflow-y: auto;
+        padding: 1.75rem;
+        box-shadow: var(--shadow-md);
+        scrollbar-width: none;
+    }
+
+        .modal::-webkit-scrollbar {
+            display: none;
+        }
+
+    .modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .modal-title {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--text);
+    }
+
+    .modal-close {
+        width: 32px;
+        height: 32px;
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-dim);
+        cursor: pointer;
+        font-size: 0.85rem;
+    }
+
+        .modal-close:hover {
+            background: var(--border);
+        }
+
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        padding: 0.6rem 0;
+        border-bottom: 1px solid var(--border);
+        font-size: 0.85rem;
+    }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+    .detail-label {
+        color: var(--text-muted);
+        font-weight: 600;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .detail-value {
+        color: var(--text);
+        font-weight: 600;
+        text-align: right;
+        max-width: 60%;
+    }
+</style>
+
+<div class="page-header">
+    <div>
+        <div class="page-title">Sipariş Yönetimi</div>
+        <div class="page-sub">Tüm siparişleri görüntüleyin</div>
+    </div>
+</div>
+
+<div class="stat-row">
+    <div class="stat-mini">
+        <div class="stat-mini-icon icon-blue"><i class="fas fa-shopping-bag"></i></div>
+        <div>
+            <div class="stat-mini-value">@ViewBag.TotalOrders</div>
+            <div class="stat-mini-label">Toplam Sipariş</div>
+        </div>
+    </div>
+    <div class="stat-mini">
+        <div class="stat-mini-icon icon-green"><i class="fas fa-turkish-lira-sign"></i></div>
+        <div>
+            <div class="stat-mini-value">@(((decimal)ViewBag.TotalRevenue).ToString("N0"))₺</div>
+            <div class="stat-mini-label">Toplam Gelir</div>
+        </div>
+    </div>
+    <div class="stat-mini">
+        <div class="stat-mini-icon icon-yellow"><i class="fas fa-calendar-day"></i></div>
+        <div>
+            <div class="stat-mini-value">@ViewBag.TodayOrders</div>
+            <div class="stat-mini-label">Bugünkü Sipariş</div>
+        </div>
+    </div>
+</div>
+
+<div class="table-wrap">
+    <div class="table-toolbar">
+        <div class="toolbar-left">
+            <input type="text" id="searchInput" class="search-input" placeholder="Sipariş no veya adres ara..." oninput="applyFilters()" style="width:240px" />
+            <select id="statusFilter" class="filter-select" onchange="applyFilters()">
+                <option value="">Tüm Durumlar</option>
+                <option value="0">Bekliyor</option>
+                <option value="1">Tamamlandı</option>
+                <option value="2">İptal</option>
+            </select>
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Sipariş</th>
+                <th>Adres</th>
+                <th>Ürünler</th>
+                <th>Tutar</th>
+                <th>Durum</th>
+                <th>İşlem</th>
+            </tr>
+        </thead>
+        <tbody id="orderTbody">
+            <tr>
+                <td colspan="6" style="text-align:center;padding:2rem;color:var(--text-muted)">
+                    <i class="fas fa-spinner fa-spin"></i> Yükleniyor...
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="table-footer">
+        <span id="paginationInfo"></span>
+        <div class="pagination" id="pagination"></div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="detailModal" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+        <div class="modal-header">
+            <div class="modal-title"><i class="fas fa-receipt" style="color:var(--accent);margin-right:0.5rem"></i> Sipariş Detayı</div>
+            <div class="modal-close" onclick="closeModal()"><i class="fas fa-xmark"></i></div>
+        </div>
+        <div class="detail-row"><span class="detail-label">Sipariş No</span><span class="detail-value" id="detailOrderId"></span></div>
+        <div class="detail-row"><span class="detail-label">Tarih</span><span class="detail-value" id="detailDate"></span></div>
+        <div class="detail-row"><span class="detail-label">Adres</span><span class="detail-value" id="detailAddress"></span></div>
+        <div class="detail-row"><span class="detail-label">Durum</span><span class="detail-value" id="detailStatus"></span></div>
+        <div class="detail-row"><span class="detail-label">Toplam</span><span class="detail-value" id="detailTotal" style="color:var(--accent);font-size:1rem"></span></div>
+        <div style="margin-top:1.25rem">
+            <div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:0.5rem">Sipariş Kalemleri</div>
+            <div id="detailItems"></div>
+        </div>
+    </div>
+</div>

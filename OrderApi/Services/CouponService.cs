@@ -57,6 +57,63 @@ public class CouponService : ICouponService
         };
     }
 
+
+    public async Task<CouponResponseDto> CreateAsync(CreateCouponDto dto)
+    {
+        var existing = await _context.Coupons
+            .FirstOrDefaultAsync(x => x.Code.ToUpper() == dto.Code.ToUpper());
+
+        if (existing != null)
+            throw new Exception("Bu kupon kodu zaten mevcut!");
+
+        var coupon = new Coupon
+        {
+            Code = dto.Code.ToUpper(),
+            DiscountType = dto.DiscountType,
+            DiscountValue = dto.DiscountValue,
+            MinimumAmount = dto.MinimumAmount,
+            UsageLimit = dto.UsageLimit,
+            ExpiresAt = dto.ExpiresAt,
+            IsActive = true,
+            UsageCount = 0
+        };
+
+        await _context.Coupons.AddAsync(coupon);
+        await _context.SaveChangesAsync();
+
+        return new CouponResponseDto
+        {
+            Id = coupon.Id,
+            Code = coupon.Code,
+            DiscountType = coupon.DiscountType,
+            DiscountValue = coupon.DiscountValue,
+            MinimumAmount = coupon.MinimumAmount,
+            UsageLimit = coupon.UsageLimit,
+            UsageCount = coupon.UsageCount,
+            ExpiresAt = coupon.ExpiresAt,
+            IsActive = coupon.IsActive
+        };
+    }
+
+    public async Task<List<CouponResponseDto>> GetAllAsync()
+    {
+        var coupons = await _context.Coupons
+            .Select(c => new CouponResponseDto
+            {
+                Id = c.Id,
+                Code = c.Code,
+                DiscountType = c.DiscountType,
+                DiscountValue = c.DiscountValue,
+                ExpiresAt = c.ExpiresAt,      // ← eksikti
+                UsageLimit = c.UsageLimit,    // ← eksikti
+                UsageCount = c.UsageCount,    // ← eksikti
+                IsActive = c.IsActive,         // ← eksikti
+                MinimumAmount = c.MinimumAmount
+            })
+            .ToListAsync();
+        return coupons;
+    }
+
     public async Task<CouponResponseDto> GetByCodeAsync(string code)
     {
         var coupon = await _context.Coupons

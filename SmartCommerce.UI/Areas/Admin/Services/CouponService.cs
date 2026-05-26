@@ -28,7 +28,7 @@ namespace SmartCommerce.UI.Areas.Admin.Services
             try
             {
                 _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-                var res = await _http.PostAsJsonAsync("https://localhost:7124/api/coupons", dto);
+                var res = await _http.PostAsJsonAsync("https://localhost:7124/api/coupons/apply", dto);
                 return res.IsSuccessStatusCode;
             }
             catch { return false; }

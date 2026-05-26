@@ -1,0 +1,622 @@
+﻿
+@{
+    ViewData["Title"] = "Invoices";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+
+@section Scripts {
+    <script>
+        let allInvoices = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.Invoices));
+        let filtered = [...allInvoices];
+        let currentPage = 1;
+        const pageSize = 10;
+
+        function renderTable() {
+            const start = (currentPage - 1) * pageSize;
+            const paged = filtered.slice(start, start + pageSize);
+            const tbody = document.getElementById('invoiceTbody');
+
+            if (paged.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--text-muted)">
+                    <i class="fas fa-file-invoice" style="font-size:1.5rem;display:block;margin-bottom:0.5rem"></i>Fatura bulunamadı</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = paged.map(inv => `
+                <tr>
+                    <td>
+                        <div style="font-weight:700;color:var(--accent);font-family:monospace;font-size:0.88rem">${inv.InvoiceNumber}</div>
+                    </td>
+                    <td>
+                        <div style="font-weight:600;color:var(--text);font-family:monospace;font-size:0.82rem">#${inv.OrderId.substring(0,8).toUpperCase()}</div>
+                    </td>
+                    <td style="font-weight:700;color:var(--accent);font-size:0.95rem">${inv.TotalAmount.toLocaleString('tr-TR')}₺</td>
+                    <td style="font-size:0.78rem;color:var(--text-muted)">${new Date(inv.CreatedAt).toLocaleDateString('tr-TR', {day:'numeric',month:'long',year:'numeric'})}</td>
+                    <td>
+                        <div style="font-family:monospace;font-size:0.72rem;color:var(--text-muted)">${inv.Id.substring(0,16)}...</div>
+                    </td>
+                    <td>
+                        <button class="btn-edit" onclick="showDetail('${inv.Id}')"><i class="fas fa-eye"></i> Görüntüle</button>
+                    </td>
+                </tr>
+            `).join('');
+
+            renderPagination();
+        }
+
+        function renderPagination() {
+            const totalPages = Math.ceil(filtered.length / pageSize);
+            document.getElementById('paginationInfo').textContent =
+                `${filtered.length} faturadan ${Math.min((currentPage-1)*pageSize+1, filtered.length)}-${Math.min(currentPage*pageSize, filtered.length)} gösteriliyor`;
+
+            const el = document.getElementById('pagination');
+            if (totalPages <= 1) { el.innerHTML = ''; return; }
+
+            let html = `<button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}><i class="fas fa-chevron-left"></i></button>`;
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === 1 || i === totalPages || (i >= currentPage-1 && i <= currentPage+1)) {
+                    html += `<button class="page-btn ${i===currentPage?'active':''}" onclick="goPage(${i})">${i}</button>`;
+                } else if (i === currentPage-2 || i === currentPage+2) {
+                    html += `<span style="padding:0 0.25rem;color:var(--text-muted)">...</span>`;
+                }
+            }
+            html += `<button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage===totalPages?'disabled':''}><i class="fas fa-chevron-right"></i></button>`;
+            el.innerHTML = html;
+        }
+
+        function goPage(p) {
+            const totalPages = Math.ceil(filtered.length / pageSize);
+            if (p < 1 || p > totalPages) return;
+            currentPage = p;
+            renderTable();
+        }
+
+        function applyFilters() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            filtered = allInvoices.filter(inv => {
+                return !search ||
+                    inv.InvoiceNumber.toLowerCase().includes(search) ||
+                    inv.OrderId.toLowerCase().includes(search);
+            });
+            currentPage = 1;
+            renderTable();
+        }
+
+        function showDetail(id) {
+            const inv = allInvoices.find(i => i.Id === id);
+            if (!inv) return;
+
+            document.getElementById('modalInvoiceNumber').textContent = inv.InvoiceNumber;
+            document.getElementById('modalOrderId').textContent = '#' + inv.OrderId.substring(0,8).toUpperCase();
+            document.getElementById('modalDate').textContent = new Date(inv.CreatedAt).toLocaleString('tr-TR');
+            document.getElementById('modalAmount').textContent = inv.TotalAmount.toLocaleString('tr-TR') + '₺';
+            document.getElementById('modalId').textContent = inv.Id;
+
+            document.getElementById('detailModal').classList.add('open');
+        }
+
+        function closeModal() {
+            document.getElementById('detailModal').classList.remove('open');
+        }
+
+        function printInvoice() {
+            window.print();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => renderTable());
+    </script>
+}
+
+<style>
+    .page-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        margin-bottom: 2rem;
+    }
+
+    .page-title {
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: var(--text);
+        letter-spacing: -0.01em;
+    }
+
+    .page-sub {
+        font-size: 0.82rem;
+        color: var(--text-muted);
+        margin-top: 0.3rem;
+    }
+
+    .stat-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .stat-mini {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1.1rem 1.5rem;
+        box-shadow: var(--shadow);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        transition: box-shadow 0.2s;
+    }
+
+        .stat-mini:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+    .stat-mini-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        flex-shrink: 0;
+    }
+
+    .stat-mini-value {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: var(--text);
+        line-height: 1;
+    }
+
+    .stat-mini-label {
+        font-size: 0.72rem;
+        color: var(--text-muted);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-top: 0.15rem;
+    }
+
+    .table-wrap {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+    }
+
+    .table-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1.1rem 1.5rem;
+        border-bottom: 1px solid var(--border);
+        background: var(--surface2);
+        gap: 1rem;
+    }
+
+    .toolbar-left {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    thead th {
+        padding: 0.75rem 1.5rem;
+        text-align: left;
+        font-size: 0.68rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--text-muted);
+        background: var(--surface2);
+        border-bottom: 1px solid var(--border);
+    }
+
+    tbody td {
+        padding: 0.9rem 1.5rem;
+        border-bottom: 1px solid var(--border);
+        vertical-align: middle;
+        font-size: 0.85rem;
+        color: var(--text-dim);
+    }
+
+    tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    tbody tr:hover td {
+        background: #fafbff;
+    }
+
+    .btn-edit {
+        background: var(--accent-bg);
+        color: var(--accent);
+        border: 1px solid rgba(66,122,181,0.2);
+        border-radius: 6px;
+        padding: 0.4rem 0.75rem;
+        cursor: pointer;
+        font-size: 0.78rem;
+        transition: background 0.15s;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+    }
+
+        .btn-edit:hover {
+            background: rgba(66,122,181,0.15);
+        }
+
+    .table-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem 1.5rem;
+        border-top: 1px solid var(--border);
+        background: var(--surface2);
+        font-size: 0.78rem;
+        color: var(--text-muted);
+    }
+
+    .pagination {
+        display: flex;
+        gap: 0.3rem;
+        align-items: center;
+    }
+
+    .page-btn {
+        width: 30px;
+        height: 30px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        color: var(--text-dim);
+        font-size: 0.78rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.15s;
+    }
+
+        .page-btn:hover:not(:disabled) {
+            background: var(--accent-bg);
+            color: var(--accent);
+            border-color: rgba(66,122,181,0.3);
+        }
+
+        .page-btn.active {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+        }
+
+        .page-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+    /* ── MODAL / FATURA ── */
+    .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.35);
+        z-index: 200;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(3px);
+    }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
+    .invoice-modal {
+        background: #fff;
+        border-radius: 16px;
+        width: 100%;
+        max-width: 520px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+        overflow: hidden;
+    }
+
+    .invoice-header {
+        background: linear-gradient(135deg, #427AB5 0%, #2d5a8e 100%);
+        padding: 2rem;
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+    }
+
+    .invoice-brand {
+        color: #fff;
+    }
+
+    .invoice-brand-name {
+        font-size: 1.2rem;
+        font-weight: 800;
+        margin-bottom: 0.2rem;
+    }
+
+    .invoice-brand-sub {
+        font-size: 0.75rem;
+        color: rgba(255,255,255,0.65);
+    }
+
+    .invoice-number-box {
+        text-align: right;
+        color: #fff;
+    }
+
+    .invoice-number-label {
+        font-size: 0.65rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: rgba(255,255,255,0.65);
+        margin-bottom: 0.2rem;
+    }
+
+    .invoice-number-value {
+        font-size: 1rem;
+        font-weight: 800;
+        font-family: monospace;
+    }
+
+    .invoice-body {
+        padding: 2rem;
+    }
+
+    .invoice-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #f0f0f0;
+        font-size: 0.88rem;
+    }
+
+        .invoice-row:last-child {
+            border-bottom: none;
+        }
+
+    .invoice-row-label {
+        color: #888;
+        font-weight: 600;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .invoice-row-value {
+        color: #1a1a2e;
+        font-weight: 600;
+    }
+
+    .invoice-total {
+        background: #f8faff;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 1rem 1.25rem;
+        margin-top: 1.25rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .invoice-total-label {
+        font-size: 0.82rem;
+        font-weight: 700;
+        color: #555;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+    }
+
+    .invoice-total-value {
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: #427AB5;
+    }
+
+    .invoice-footer {
+        padding: 1.25rem 2rem;
+        border-top: 1px solid #f0f0f0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: #fafbff;
+    }
+
+    .invoice-footer-note {
+        font-size: 0.72rem;
+        color: #aaa;
+    }
+
+    .invoice-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .btn-print {
+        background: #427AB5;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 0.55rem 1rem;
+        font-size: 0.78rem;
+        font-weight: 700;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        transition: background 0.15s;
+    }
+
+        .btn-print:hover {
+            background: #2d5a8e;
+        }
+
+    .btn-close-inv {
+        background: #f5f7fb;
+        color: #555;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 0.55rem 1rem;
+        font-size: 0.78rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.15s;
+    }
+
+        .btn-close-inv:hover {
+            background: #e2e8f0;
+        }
+
+    @@media print {
+        body * {
+            visibility: hidden;
+        }
+
+        .invoice-modal, .invoice-modal * {
+            visibility: visible;
+        }
+
+        .invoice-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            border-radius: 0;
+            box-shadow: none;
+        }
+
+        .invoice-actions {
+            display: none;
+        }
+
+        .modal-overlay {
+            background: #fff;
+        }
+    }
+</style>
+
+<!-- HEADER -->
+<div class="page-header">
+    <div>
+        <div class="page-title">Fatura Yönetimi</div>
+        <div class="page-sub">Tüm faturaları görüntüleyin</div>
+    </div>
+</div>
+
+<!-- STAT CARDS -->
+<div class="stat-row">
+    <div class="stat-mini">
+        <div class="stat-mini-icon icon-blue"><i class="fas fa-file-invoice"></i></div>
+        <div>
+            <div class="stat-mini-value">@ViewBag.TotalInvoices</div>
+            <div class="stat-mini-label">Toplam Fatura</div>
+        </div>
+    </div>
+    <div class="stat-mini">
+        <div class="stat-mini-icon icon-green"><i class="fas fa-turkish-lira-sign"></i></div>
+        <div>
+            <div class="stat-mini-value">@(((decimal)ViewBag.TotalAmount).ToString("N0"))₺</div>
+            <div class="stat-mini-label">Toplam Tutar</div>
+        </div>
+    </div>
+    <div class="stat-mini">
+        <div class="stat-mini-icon icon-yellow"><i class="fas fa-calendar-day"></i></div>
+        <div>
+            <div class="stat-mini-value">@ViewBag.TodayInvoices</div>
+            <div class="stat-mini-label">Bugünkü Fatura</div>
+        </div>
+    </div>
+</div>
+
+<!-- TABLO -->
+<div class="table-wrap">
+    <div class="table-toolbar">
+        <div class="toolbar-left">
+            <input type="text" id="searchInput" class="search-input" placeholder="Fatura no veya sipariş no ara..." oninput="applyFilters()" style="width:280px" />
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Fatura No</th>
+                <th>Sipariş No</th>
+                <th>Tutar</th>
+                <th>Tarih</th>
+                <th>Fatura ID</th>
+                <th>İşlem</th>
+            </tr>
+        </thead>
+        <tbody id="invoiceTbody">
+            <tr>
+                <td colspan="6" style="text-align:center;padding:2rem;color:var(--text-muted)">
+                    <i class="fas fa-spinner fa-spin"></i> Yükleniyor...
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="table-footer">
+        <span id="paginationInfo"></span>
+        <div class="pagination" id="pagination"></div>
+    </div>
+</div>
+
+<!-- FATURA DETAY MODAL -->
+<div class="modal-overlay" id="detailModal" onclick="if(event.target===this)closeModal()">
+    <div class="invoice-modal">
+
+        <div class="invoice-header">
+            <div class="invoice-brand">
+                <div class="invoice-brand-name">Berkay Store</div>
+                <div class="invoice-brand-sub">berkaystore.com</div>
+            </div>
+            <div class="invoice-number-box">
+                <div class="invoice-number-label">Fatura No</div>
+                <div class="invoice-number-value" id="modalInvoiceNumber"></div>
+            </div>
+        </div>
+
+        <div class="invoice-body">
+            <div class="invoice-row">
+                <span class="invoice-row-label">Sipariş No</span>
+                <span class="invoice-row-value" id="modalOrderId"></span>
+            </div>
+            <div class="invoice-row">
+                <span class="invoice-row-label">Fatura Tarihi</span>
+                <span class="invoice-row-value" id="modalDate"></span>
+            </div>
+            <div class="invoice-row">
+                <span class="invoice-row-label">Fatura ID</span>
+                <span class="invoice-row-value" id="modalId" style="font-family:monospace;font-size:0.75rem;color:#888"></span>
+            </div>
+
+            <div class="invoice-total">
+                <span class="invoice-total-label">Toplam Tutar</span>
+                <span class="invoice-total-value" id="modalAmount"></span>
+            </div>
+        </div>
+
+        <div class="invoice-footer">
+            <div class="invoice-footer-note">Berkay Store &copy; @DateTime.Now.Year</div>
+            <div class="invoice-actions">
+                <button class="btn-close-inv" onclick="closeModal()">Kapat</button>
+                <button class="btn-print" onclick="printInvoice()"><i class="fas fa-print"></i> Yazdır</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+

@@ -18,6 +18,21 @@ namespace OrderApi.Controllers
             _couponService = couponService;
         }
 
+
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] CreateCouponDto dto)
+        {
+            try
+            {
+                var result = await _couponService.CreateAsync(dto);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         [HttpPost("apply")]
         public async Task<IActionResult> Apply(ApplyCouponDto dto)
         {
@@ -38,6 +53,20 @@ namespace OrderApi.Controllers
             try
             {
                 var result = await _couponService.GetByCodeAsync(code);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetAll()
+        {
+            try
+            {
+                var result = await _couponService.GetAllAsync();
                 return Ok(result);
             }
             catch (Exception ex)

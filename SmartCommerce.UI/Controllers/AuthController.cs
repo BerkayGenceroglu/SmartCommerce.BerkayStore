@@ -44,16 +44,14 @@ namespace SmartCommerce.UI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Register(string fullName, string email, string password)
+        public async Task<IActionResult> Register(string fullName, string email, string password, string? phoneNumber, string? gender, string? city)
         {
-            var success = await _authService.RegisterAsync(fullName, email, password);
-
+            var success = await _authService.RegisterAsync(fullName, email, password, phoneNumber, gender, city);
             if (!success)
             {
                 ViewBag.Error = "Kayıt oluşturulamadı. Email zaten kullanımda olabilir.";
                 return View();
             }
-
             ViewBag.Success = "Kayıt başarılı! Giriş yapabilirsiniz.";
             return View();
         }

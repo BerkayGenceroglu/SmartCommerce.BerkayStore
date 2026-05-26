@@ -7,5 +7,7 @@ namespace SmartCommerce.UI.Areas.Admin.Context
         public AdminDbContext(DbContextOptions<AdminDbContext> options) : base(options) { }
 
         public DbSet<CargoEntity> Cargos => Set<CargoEntity>();
+        public DbSet<InvoiceEntity> Invoices => Set<InvoiceEntity>();
+        public DbSet<ReviewEntity> Reviews => Set<ReviewEntity>();
     }
 }

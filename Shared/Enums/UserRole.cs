@@ -9,6 +9,6 @@ namespace Shared.Enums
     public enum UserRole
     {
         Admin,
-        Customer
+        Customer,
     }
 }

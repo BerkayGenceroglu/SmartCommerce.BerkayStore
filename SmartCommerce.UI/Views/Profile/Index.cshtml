@@ -1,0 +1,532 @@
+﻿@{
+    ViewData["Title"] = "Profilim";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .profile-wrap {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 3rem 2rem 6rem;
+    }
+
+    .profile-breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.78rem;
+        color: var(--text-muted);
+        margin-bottom: 2.5rem;
+        font-family: var(--font-body);
+    }
+
+        .profile-breadcrumb a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+            .profile-breadcrumb a:hover {
+                color: var(--accent);
+            }
+
+        .profile-breadcrumb i {
+            font-size: 0.6rem;
+        }
+
+    .profile-hero {
+        display: flex;
+        align-items: center;
+        padding-bottom: 2rem;
+        margin-bottom: 2.5rem;
+        border-bottom: 1px solid var(--border);
+        gap: 1.25rem;
+    }
+
+    .profile-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 14px;
+        background: var(--accent);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--font-display);
+        font-weight: 800;
+        font-size: 1.3rem;
+        color: #fff;
+        letter-spacing: -0.02em;
+        flex-shrink: 0;
+    }
+
+    .profile-hero-name {
+        font-family: var(--font-display);
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: var(--text);
+        letter-spacing: -0.02em;
+        line-height: 1.2;
+    }
+
+    .profile-hero-email {
+        font-size: 0.82rem;
+        color: var(--text-muted);
+        margin-top: 0.2rem;
+        font-family: var(--font-body);
+    }
+
+    .profile-hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        background: rgba(26,107,60,0.08);
+        border: 1px solid rgba(26,107,60,0.15);
+        color: var(--accent);
+        font-size: 0.7rem;
+        font-weight: 600;
+        font-family: var(--font-display);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        padding: 0.25rem 0.7rem;
+        border-radius: 4px;
+        margin-top: 0.4rem;
+    }
+
+    .profile-tabs {
+        display: flex;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 2.5rem;
+    }
+
+    .profile-tab {
+        font-family: var(--font-display);
+        font-size: 0.8rem;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        padding: 0.85rem 1.5rem;
+        border-bottom: 2px solid transparent;
+        cursor: pointer;
+        transition: color 0.2s, border-color 0.2s;
+        background: none;
+        border-top: none;
+        border-left: none;
+        border-right: none;
+        margin-bottom: -1px;
+    }
+
+        .profile-tab:hover {
+            color: var(--text);
+        }
+
+        .profile-tab.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+    .profile-panel {
+        display: none;
+    }
+
+        .profile-panel.active {
+            display: block;
+        }
+
+    .form-section {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 2rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-section-title {
+        font-family: var(--font-display);
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .form-row-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.25rem;
+    }
+
+    .form-row-3 {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 1.25rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.25rem;
+    }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+    .form-label {
+        display: block;
+        font-family: var(--font-display);
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--text-dim);
+        margin-bottom: 0.5rem;
+    }
+
+    .form-input, .form-select {
+        width: 100%;
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        color: var(--text);
+        font-family: var(--font-body);
+        font-size: 0.88rem;
+        font-weight: 300;
+        padding: 0.65rem 0.9rem;
+        outline: none;
+        transition: border-color 0.2s;
+        box-sizing: border-box;
+    }
+
+    .form-select {
+        cursor: pointer;
+    }
+
+        .form-input:focus, .form-select:focus {
+            border-color: var(--accent);
+        }
+
+    .form-input::placeholder {
+        color: var(--text-muted);
+    }
+
+    .form-input:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .form-hint {
+        font-size: 0.72rem;
+        color: var(--text-muted);
+        margin-top: 0.35rem;
+        font-family: var(--font-body);
+    }
+
+    .btn-submit {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: var(--accent);
+        color: #fff;
+        border: none;
+        font-family: var(--font-display);
+        font-weight: 700;
+        font-size: 0.78rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        padding: 0.65rem 1.5rem;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: opacity 0.2s, transform 0.1s;
+    }
+
+        .btn-submit:hover {
+            opacity: 0.85;
+            transform: translateY(-1px);
+        }
+
+    .btn-danger {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: transparent;
+        color: #dc2626;
+        border: 1px solid #fecaca;
+        font-family: var(--font-display);
+        font-weight: 700;
+        font-size: 0.78rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        padding: 0.65rem 1.5rem;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+        .btn-danger:hover {
+            background: #fff5f5;
+        }
+
+    .form-actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 0.75rem;
+        margin-top: 1.75rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--border);
+    }
+
+    /* ── TOAST ── */
+    .profile-toast {
+        position: fixed;
+        bottom: 2rem;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 9999;
+        border-radius: 10px;
+        padding: 1rem 2rem;
+        font-size: 0.95rem;
+        font-family: var(--font-display);
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        min-width: 320px;
+        max-width: 520px;
+        animation: toastIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+        .profile-toast.success {
+            background: var(--accent);
+            color: #fff;
+            box-shadow: 0 8px 32px rgba(26,107,60,0.35);
+        }
+
+            .profile-toast.success i {
+                font-size: 1.1rem;
+                color: rgba(255,255,255,0.9);
+            }
+
+        .profile-toast.error {
+            background: #dc2626;
+            color: #fff;
+            box-shadow: 0 8px 32px rgba(220,38,38,0.35);
+        }
+
+            .profile-toast.error i {
+                font-size: 1.1rem;
+                color: rgba(255,255,255,0.9);
+            }
+
+    @@keyframes toastIn {
+        from {
+            opacity: 0;
+            transform: translateX(-50%) translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .form-row-2, .form-row-3 {
+            grid-template-columns: 1fr;
+        }
+
+        .profile-hero {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+</style>
+
+@if (TempData["Success"] != null)
+{
+    <div id="profileToast" class="profile-toast success">
+        <i class="fas fa-check"></i> @TempData["Success"]
+    </div>
+    <script>setTimeout(() => document.getElementById('profileToast')?.remove(), 3500);</script>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div id="profileToast" class="profile-toast error">
+        <i class="fas fa-xmark"></i> @TempData["Error"]
+    </div>
+    <script>setTimeout(() => document.getElementById('profileToast')?.remove(), 3500);</script>
+}
+
+<div class="profile-wrap">
+
+    <div class="profile-breadcrumb">
+        <a href="/">Anasayfa</a>
+        <i class="fas fa-chevron-right"></i>
+        <span>Profilim</span>
+    </div>
+
+    <div class="profile-hero">
+        <div class="profile-avatar" id="avatarEl">?</div>
+        <div>
+            <div class="profile-hero-name" id="headerName">Yükleniyor...</div>
+            <div class="profile-hero-email" id="headerEmail"></div>
+            <div class="profile-hero-badge"><i class="fas fa-circle" style="font-size:0.5rem"></i> Üye</div>
+        </div>
+    </div>
+
+    <div class="profile-tabs">
+        <button class="profile-tab" id="tab-info" onclick="switchTab('info', this)">Hesap Bilgileri</button>
+        <button class="profile-tab" id="tab-password" onclick="switchTab('password', this)">Şifre</button>
+    </div>
+
+    <!-- PANEL: BİLGİLER -->
+    <div class="profile-panel" id="panel-info">
+        <form method="post" action="/Profile/UpdateProfile">
+            @Html.AntiForgeryToken()
+
+            <!-- KİŞİSEL -->
+            <div class="form-section">
+                <div class="form-section-title">Kişisel Bilgiler</div>
+                <div class="form-row-2">
+                    <div class="form-group">
+                        <label class="form-label">Ad Soyad</label>
+                        <input type="text" class="form-input" name="fullName" id="fullNameInput" placeholder="Ad Soyad" required />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">E-posta</label>
+                        <input type="email" class="form-input" id="emailInput" placeholder="E-posta" disabled />
+                        <div class="form-hint">E-posta adresi değiştirilemez.</div>
+                    </div>
+                </div>
+                <br />
+                <div class="form-row-2">
+                    <div class="form-group">
+                        <label class="form-label">Telefon Numarası</label>
+                        <input type="tel" class="form-input" name="phoneNumber" id="phoneInput" placeholder="+90 5XX XXX XX XX" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Cinsiyet</label>
+                        <select class="form-select" name="gender" id="genderInput">
+                            <option value="">Seçiniz</option>
+                            <option value="Erkek">Erkek</option>
+                            <option value="Kadın">Kadın</option>
+                            <option value="Belirtmek istemiyorum">Belirtmek istemiyorum</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ADRES -->
+            <div class="form-section">
+                <div class="form-section-title">Konum Bilgileri</div>
+                <div class="form-row-2">
+                    <div class="form-group">
+                        <label class="form-label">Ülke</label>
+                        <select class="form-select" name="country" id="countryInput">
+                            <option value="">Seçiniz</option>
+                            <option value="Türkiye">Türkiye</option>
+                            <option value="Almanya">Almanya</option>
+                            <option value="Fransa">Fransa</option>
+                            <option value="İngiltere">İngiltere</option>
+                            <option value="Amerika">Amerika</option>
+                            <option value="Diğer">Diğer</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Şehir</label>
+                        <input type="text" class="form-input" name="city" id="cityInput" placeholder="Şehir" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-submit"><i class="fas fa-check"></i> Kaydet</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- PANEL: ŞİFRE -->
+    <div class="profile-panel" id="panel-password">
+        <form method="post" action="/Profile/ChangePassword">
+            @Html.AntiForgeryToken()
+            <div class="form-section">
+                <div class="form-section-title">Şifre Değiştir</div>
+                <div class="form-group">
+                    <label class="form-label">Mevcut Şifre</label>
+                    <input type="password" class="form-input" name="currentPassword" placeholder="••••••••" required />
+                </div>
+                <div class="form-row-2">
+                    <div class="form-group">
+                        <label class="form-label">Yeni Şifre</label>
+                        <input type="password" class="form-input" name="newPassword" placeholder="••••••••" required />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Yeni Şifre Tekrar</label>
+                        <input type="password" class="form-input" name="confirmPassword" placeholder="••••••••" required />
+                    </div>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn-danger"><i class="fas fa-key"></i> Şifreyi Değiştir</button>
+            </div>
+        </form>
+    </div>
+
+</div>
+
+<script>
+    function switchTab(panel, el) {
+        document.querySelectorAll('.profile-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.profile-panel').forEach(p => p.classList.remove('active'));
+        el.classList.add('active');
+        document.getElementById('panel-' + panel).classList.add('active');
+    }
+
+    const activeTab = '@(TempData["ActiveTab"]?.ToString() ?? "info")';
+    document.getElementById('tab-' + activeTab).classList.add('active');
+    document.getElementById('panel-' + activeTab).classList.add('active');
+
+    async function loadProfile() {
+        try {
+            const token = '@Html.Raw(Context.Session.GetString("Token"))';
+            if (!token) return;
+
+            const res = await fetch('https://localhost:7038/api/auth/profile', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                const name = data.fullName || data.FullName || '';
+                const email = data.email || data.Email || '';
+
+                document.getElementById('headerName').textContent = name;
+                document.getElementById('headerEmail').textContent = email;
+                document.getElementById('fullNameInput').value = name;
+                document.getElementById('emailInput').value = email;
+
+                // Opsiyonel alanlar
+                if (data.phoneNumber || data.PhoneNumber)
+                    document.getElementById('phoneInput').value = data.phoneNumber || data.PhoneNumber;
+                if (data.gender || data.Gender)
+                    document.getElementById('genderInput').value = data.gender || data.Gender;
+                if (data.country || data.Country)
+                    document.getElementById('countryInput').value = data.country || data.Country;
+                if (data.city || data.City)
+                    document.getElementById('cityInput').value = data.city || data.City;
+
+                const initials = name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+                document.getElementById('avatarEl').textContent = initials;
+            }
+        } catch (e) {
+            console.error('Profil yüklenemedi:', e);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadProfile);
+</script>

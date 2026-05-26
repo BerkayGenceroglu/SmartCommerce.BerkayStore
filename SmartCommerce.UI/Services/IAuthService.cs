@@ -3,7 +3,8 @@
     public interface IAuthService
     {
         Task<AuthResult> LoginAsync(string email, string password);
-        Task<bool> RegisterAsync(string fullName, string email, string password);
+        Task<bool> RegisterAsync(string fullName, string email, string password, string? phoneNumber, string? gender, string? city);
+
     }
     public class AuthResult
     {

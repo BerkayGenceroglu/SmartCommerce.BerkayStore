@@ -1,0 +1,345 @@
+﻿@{
+    ViewData["Title"] = "Kullanıcı Yönetimi";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+@section Scripts {
+    <script>
+    
+        let allUsers = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.Users));
+        let filtered = [...allUsers];
+        let currentPage = 1;
+        const pageSize = 10;
+
+        function getInitials(name) {
+            return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+        }
+
+        function getAvatarColor(name) {
+            const colors = ['#427AB5','#38a169','#d69e2e','#805ad5','#ed8936','#e53e3e','#38b2ac'];
+            let hash = 0;
+            for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+            return colors[Math.abs(hash) % colors.length];
+        }
+
+        function renderTable() {
+            const start = (currentPage - 1) * pageSize;
+            const paged = filtered.slice(start, start + pageSize);
+            const tbody = document.getElementById('userTbody');
+
+            if (paged.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--text-muted)">
+                    <i class="fas fa-users" style="font-size:1.5rem;display:block;margin-bottom:0.5rem"></i>Kullanıcı bulunamadı</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = paged.map(u => `
+                <tr>
+                    <td>
+                        <div style="display:flex;align-items:center;gap:0.75rem">
+                            <div style="width:36px;height:36px;border-radius:10px;background:${getAvatarColor(u.FullName)};display:flex;align-items:center;justify-content:center;font-size:0.78rem;font-weight:800;color:#fff;flex-shrink:0">
+                                ${getInitials(u.FullName)}
+                            </div>
+                            <div>
+                                <div style="font-weight:600;color:var(--text);font-size:0.85rem">${u.FullName}</div>
+                                <div style="font-size:0.72rem;color:var(--text-muted)">${u.Email}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge ${u.Role === 0 ? 'badge-red' : 'badge-blue'}">
+                            <i class="fas ${u.Role === 0 ? 'fa-shield-halved' : 'fa-user'}"></i>
+                            ${u.Role === 0 ? 'Admin' : 'Kullanıcı'}
+                        </span>
+                    </td>
+                    <td style="font-size:0.78rem;color:var(--text-muted)">${new Date(u.CreatedAt).toLocaleDateString('tr-TR', {day:'numeric',month:'long',year:'numeric'})}</td>
+                    <td><div style="font-family:monospace;font-size:0.72rem;color:var(--text-muted)">${u.Id.substring(0,16)}...</div></td>
+                </tr>
+            `).join('');
+
+            renderPagination();
+        }
+
+        function renderPagination() {
+            const totalPages = Math.ceil(filtered.length / pageSize);
+            document.getElementById('paginationInfo').textContent =
+                `${filtered.length} kullanıcıdan ${Math.min((currentPage-1)*pageSize+1, filtered.length)}-${Math.min(currentPage*pageSize, filtered.length)} gösteriliyor`;
+
+            const el = document.getElementById('pagination');
+            if (totalPages <= 1) { el.innerHTML = ''; return; }
+
+            let html = `<button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}><i class="fas fa-chevron-left"></i></button>`;
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === 1 || i === totalPages || (i >= currentPage-1 && i <= currentPage+1)) {
+                    html += `<button class="page-btn ${i===currentPage?'active':''}" onclick="goPage(${i})">${i}</button>`;
+                } else if (i === currentPage-2 || i === currentPage+2) {
+                    html += `<span style="padding:0 0.25rem;color:var(--text-muted)">...</span>`;
+                }
+            }
+            html += `<button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage===totalPages?'disabled':''}><i class="fas fa-chevron-right"></i></button>`;
+            el.innerHTML = html;
+        }
+
+        function goPage(p) {
+            const totalPages = Math.ceil(filtered.length / pageSize);
+            if (p < 1 || p > totalPages) return;
+            currentPage = p;
+            renderTable();
+        }
+
+        function applyFilters() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const role = document.getElementById('roleFilter').value;
+            filtered = allUsers.filter(u => {
+                const matchSearch = !search || u.FullName.toLowerCase().includes(search) || u.Email.toLowerCase().includes(search);
+                const matchRole = role === '' || u.Role === parseInt(role);
+                return matchSearch && matchRole;
+            });
+            currentPage = 1;
+            renderTable();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => renderTable());
+    </script>
+}
+
+<style>
+    .page-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        margin-bottom: 2rem;
+    }
+
+    .page-title {
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: var(--text);
+        letter-spacing: -0.01em;
+    }
+
+    .page-sub {
+        font-size: 0.82rem;
+        color: var(--text-muted);
+        margin-top: 0.3rem;
+    }
+
+    .stat-row {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .stat-mini {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1.1rem 1.5rem;
+        box-shadow: var(--shadow);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        transition: box-shadow 0.2s;
+    }
+
+        .stat-mini:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+    .stat-mini-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        flex-shrink: 0;
+    }
+
+    .stat-mini-value {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: var(--text);
+        line-height: 1;
+    }
+
+    .stat-mini-label {
+        font-size: 0.72rem;
+        color: var(--text-muted);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-top: 0.15rem;
+    }
+
+    .table-wrap {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+    }
+
+    .table-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1.1rem 1.5rem;
+        border-bottom: 1px solid var(--border);
+        background: var(--surface2);
+        gap: 1rem;
+    }
+
+    .toolbar-left {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+    }
+
+    .filter-select {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        color: var(--text);
+        font-family: var(--font);
+        font-size: 0.82rem;
+        padding: 0.5rem 0.75rem;
+        outline: none;
+        cursor: pointer;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    thead th {
+        padding: 0.75rem 1.5rem;
+        text-align: left;
+        font-size: 0.68rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--text-muted);
+        background: var(--surface2);
+        border-bottom: 1px solid var(--border);
+    }
+
+    tbody td {
+        padding: 0.9rem 1.5rem;
+        border-bottom: 1px solid var(--border);
+        vertical-align: middle;
+        font-size: 0.85rem;
+        color: var(--text-dim);
+    }
+
+    tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    tbody tr:hover td {
+        background: #fafbff;
+    }
+
+    .table-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem 1.5rem;
+        border-top: 1px solid var(--border);
+        background: var(--surface2);
+        font-size: 0.78rem;
+        color: var(--text-muted);
+    }
+
+    .pagination {
+        display: flex;
+        gap: 0.3rem;
+        align-items: center;
+    }
+
+    .page-btn {
+        width: 30px;
+        height: 30px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        color: var(--text-dim);
+        font-size: 0.78rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.15s;
+    }
+
+        .page-btn:hover:not(:disabled) {
+            background: var(--accent-bg);
+            color: var(--accent);
+            border-color: rgba(66,122,181,0.3);
+        }
+
+        .page-btn.active {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+        }
+
+        .page-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+</style>
+
+<div class="page-header">
+    <div>
+        <div class="page-title">Kullanıcı Yönetimi</div>
+        <div class="page-sub">Tüm kullanıcıları görüntüleyin</div>
+    </div>
+</div>
+
+<div class="stat-row">
+    <div class="stat-mini">
+        <div class="stat-mini-icon icon-blue"><i class="fas fa-users"></i></div>
+        <div><div class="stat-mini-value">@ViewBag.TotalUsers</div><div class="stat-mini-label">Toplam Kullanıcı</div></div>
+    </div>
+    <div class="stat-mini">
+        <div class="stat-mini-icon icon-red"><i class="fas fa-shield-halved"></i></div>
+        <div><div class="stat-mini-value">@ViewBag.AdminCount</div><div class="stat-mini-label">Admin</div></div>
+    </div>
+    <div class="stat-mini">
+        <div class="stat-mini-icon icon-blue"><i class="fas fa-user"></i></div>
+        <div><div class="stat-mini-value">@ViewBag.UserCount</div><div class="stat-mini-label">Kullanıcı</div></div>
+    </div>
+    <div class="stat-mini">
+        <div class="stat-mini-icon icon-green"><i class="fas fa-user-plus"></i></div>
+        <div><div class="stat-mini-value">@ViewBag.NewUsersThisMonth</div><div class="stat-mini-label">Bu Ay Yeni</div></div>
+    </div>
+</div>
+
+<div class="table-wrap">
+    <div class="table-toolbar">
+        <div class="toolbar-left">
+            <input type="text" id="searchInput" class="search-input" placeholder="İsim veya e-posta ara..." oninput="applyFilters()" style="width:240px" />
+            <select id="roleFilter" class="filter-select" onchange="applyFilters()">
+                <option value="">Tüm Roller</option>
+                <option value="0">Admin</option>
+                <option value="1">Kullanıcı</option>
+            </select>
+        </div>
+    </div>
+    <table>
+        <thead>
+            <tr><th>Kullanıcı</th><th>Rol</th><th>Kayıt Tarihi</th><th>ID</th></tr>
+        </thead>
+        <tbody id="userTbody">
+            <tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--text-muted)"><i class="fas fa-spinner fa-spin"></i> Yükleniyor...</td></tr>
+        </tbody>
+    </table>
+    <div class="table-footer">
+        <span id="paginationInfo"></span>
+        <div class="pagination" id="pagination"></div>
+    </div>
+</div>

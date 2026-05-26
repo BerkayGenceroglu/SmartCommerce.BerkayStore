@@ -1,8 +1,6 @@
-﻿using Shared.Enums;
-
-namespace UserApi.Entities
+﻿namespace UserApi.Dtos
 {
-    public class ApiUser
+    public class ProfileDto
     {
         public Guid Id { get; set; }
         public string FullName { get; set; } = null!;
@@ -11,8 +9,6 @@ namespace UserApi.Entities
         public string? Country { get; set; }
         public string? City { get; set; }
         public string? Gender { get; set; }
-        public string PasswordHash { get; set; } = null!;
-        public UserRole Role { get; set; } = UserRole.Admin;
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; }
     }
 }

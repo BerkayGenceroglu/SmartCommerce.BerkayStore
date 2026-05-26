@@ -48,7 +48,7 @@ namespace SmartCommerce.UI.Services
             }
         }
 
-        public async Task<bool> RegisterAsync(string fullName, string email, string password)
+        public async Task<bool> RegisterAsync(string fullName, string email, string password, string? phoneNumber, string? gender, string? city)
         {
             try
             {
@@ -56,15 +56,14 @@ namespace SmartCommerce.UI.Services
                 {
                     fullName,
                     email,
-                    password
+                    password,
+                    phoneNumber,
+                    gender,
+                    city
                 });
-
                 return res.IsSuccessStatusCode;
             }
-            catch
-            {
-                return false;
-            }
+            catch { return false; }
         }
     }
 }

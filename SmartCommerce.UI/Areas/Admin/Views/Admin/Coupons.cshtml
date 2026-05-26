@@ -1,0 +1,324 @@
+﻿@{
+    ViewData["Title"] = "Kupon Yönetimi";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+@section Scripts {
+    <script>
+        const adminToken = sessionStorage.getItem('adminToken');
+
+        let allCoupons = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.Coupons, 
+            new Newtonsoft.Json.JsonSerializerSettings { 
+                ContractResolver = new Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver() 
+            }));
+            
+        let filtered = [...allCoupons];
+        let currentPage = 1;
+        const pageSize = 10;
+
+        function formatExpiry(val) {
+            if (!val) return '-';
+
+            // "0001-01-01" veya "1-01-01" → geçersiz (default DateTime)
+            const safeIso = val.replace(' ', 'T');
+            const d = new Date(safeIso);
+            if (isNaN(d.getTime()) || d.getFullYear() < 2000) return '-';
+
+            return d.toLocaleString('tr-TR', {
+                day: '2-digit', month: '2-digit', year: 'numeric',
+                hour: '2-digit', minute: '2-digit'
+            });
+        }
+
+        function renderTable() {
+            const start = (currentPage - 1) * pageSize;
+            const paged = filtered.slice(start, start + pageSize);
+            const tbody = document.getElementById('couponTbody');
+
+            if (paged.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--text-muted)">
+                    <i class="fas fa-ticket" style="font-size:1.5rem;display:block;margin-bottom:0.5rem"></i>Kupon bulunamadı</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = paged.map(c => `
+            <tr>
+                <td>
+                    <div style="background:var(--accent-bg);border:1px dashed rgba(66,122,181,0.4);border-radius:6px;padding:0.3rem 0.75rem;font-weight:800;font-family:monospace;color:var(--accent);font-size:0.85rem;letter-spacing:0.05em;display:inline-block">
+                        ${c.code}
+                    </div>
+                </td>
+                <td>
+                    <span class="badge ${c.discountType === 1 ? 'badge-blue' : 'badge-green'}">
+                        ${c.discountType === 1
+                            ? '%' + c.discountValue + ' İndirim'
+                            : c.discountValue.toLocaleString('tr-TR') + '₺ İndirim'}
+                    </span>
+                </td>
+                <td style="font-size:0.82rem;color:var(--text-dim)">
+                    ${c.minimumAmount ? c.minimumAmount.toLocaleString('tr-TR') + '₺' : '-'}
+                </td>
+                <td style="font-size:0.82rem;color:var(--text-muted)">
+                    ${formatExpiry(c.expiresAt)}
+                </td>
+                <td>
+                    <button class="btn-danger" onclick="deleteCoupon('${c.id}', '${c.code}')">
+                        <i class="fas fa-trash"></i> Sil
+                    </button>
+                </td>
+            </tr>
+            `).join('');
+
+            renderPagination();
+        }
+
+        function renderPagination() {
+            const totalPages = Math.ceil(filtered.length / pageSize);
+            const infoEl = document.getElementById('paginationInfo');
+
+            if (filtered.length === 0) {
+                infoEl.textContent = "Gösterilecek kayıt yok";
+                document.getElementById('pagination').innerHTML = '';
+                return;
+            }
+
+            infoEl.textContent = `${filtered.length} kupondan ${Math.min((currentPage-1)*pageSize+1, filtered.length)}-${Math.min(currentPage*pageSize, filtered.length)} gösteriliyor`;
+
+            const el = document.getElementById('pagination');
+            if (totalPages <= 1) { el.innerHTML = ''; return; }
+
+            let html = `<button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}><i class="fas fa-chevron-left"></i></button>`;
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === 1 || i === totalPages || (i >= currentPage-1 && i <= currentPage+1)) {
+                    html += `<button class="page-btn ${i===currentPage?'active':''}" onclick="goPage(${i})">${i}</button>`;
+                } else if (i === currentPage-2 || i === currentPage+2) {
+                    html += `<span style="padding:0 0.25rem;color:var(--text-muted)">...</span>`;
+                }
+            }
+            html += `<button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage===totalPages?'disabled':''}><i class="fas fa-chevron-right"></i></button>`;
+            el.innerHTML = html;
+        }
+
+        function goPage(p) {
+            const totalPages = Math.ceil(filtered.length / pageSize);
+            if (p < 1 || p > totalPages) return;
+            currentPage = p;
+            renderTable();
+        }
+
+        function applyFilters() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            filtered = allCoupons.filter(c => !search || c.code.toLowerCase().includes(search));
+            currentPage = 1;
+            renderTable();
+        }
+
+        async function deleteCoupon(id, code) {
+            if (!confirm(`"${code}" kuponunu silmek istediğinize emin misiniz?`)) return;
+            try {
+                const res = await fetch(`https://localhost:7124/api/coupons/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': 'Bearer ' + adminToken }
+                });
+                if (res.ok) {
+                    allCoupons = allCoupons.filter(c => c.id !== id);
+                    filtered = filtered.filter(c => c.id !== id);
+                    renderTable();
+                    showToast('Kupon silindi.');
+                    document.getElementById('statTotal').textContent = allCoupons.length;
+                } else {
+                    showToast('Silme işlemi başarısız.', 'error');
+                }
+            } catch { showToast('Bağlantı hatası.', 'error'); }
+        }
+
+        async function createCoupon() {
+            const code = document.getElementById('newCode').value.trim().toUpperCase();
+            const discountType = parseInt(document.getElementById('newType').value);
+            const discountValue = parseFloat(document.getElementById('newValue').value);
+            const minimumAmount = parseFloat(document.getElementById('newMinOrder').value) || 0;
+            const usageLimit = parseInt(document.getElementById('newUsageLimit').value) || 0;
+            const expiresAt = document.getElementById('newExpiresAt').value;
+
+            if (!code || !discountValue) {
+                showToast('Lütfen zorunlu alanları doldurun.', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('createBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Oluşturuluyor...';
+
+            try {
+                const res = await fetch('https://localhost:7124/api/coupons', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + adminToken },
+                    body: JSON.stringify({ code, discountType, discountValue, minimumAmount, usageLimit, expiresAt: expiresAt || null })
+                });
+
+                if (res.ok) {
+                    showToast('Kupon oluşturuldu!');
+                    closeModal();
+                    setTimeout(() => window.location.reload(), 800);
+                } else {
+                    const err = await res.text();
+                    showToast(err || 'Bir hata oluştu.', 'error');
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-plus"></i> Oluştur';
+                }
+            } catch {
+                showToast('Bağlantı hatası.', 'error');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-plus"></i> Oluştur';
+            }
+        }
+
+        function openModal() { document.getElementById('createModal').classList.add('open'); }
+        function closeModal() { document.getElementById('createModal').classList.remove('open'); }
+
+        document.addEventListener('DOMContentLoaded', () => renderTable());
+    </script>
+}
+
+<style>
+    .page-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 2rem; }
+    .page-title { font-size: 1.4rem; font-weight: 800; color: var(--text); letter-spacing: -0.01em; }
+    .page-sub { font-size: 0.82rem; color: var(--text-muted); margin-top: 0.3rem; }
+    .stat-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+    .stat-mini { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.1rem 1.5rem; box-shadow: var(--shadow); display: flex; align-items: center; gap: 1rem; }
+    .stat-mini-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
+    .stat-mini-value { font-size: 1.5rem; font-weight: 800; color: var(--text); line-height: 1; }
+    .stat-mini-label { font-size: 0.72rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.15rem; }
+    .table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; box-shadow: var(--shadow); overflow: hidden; }
+    .table-toolbar { display: flex; align-items: center; justify-content: space-between; padding: 1.1rem 1.5rem; border-bottom: 1px solid var(--border); background: var(--surface2); gap: 1rem; }
+    .toolbar-left { display: flex; gap: 0.5rem; align-items: center; }
+    table { width: 100%; border-collapse: collapse; }
+    thead th { padding: 0.75rem 1.5rem; text-align: left; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); background: var(--surface2); border-bottom: 1px solid var(--border); }
+    tbody td { padding: 0.9rem 1.5rem; border-bottom: 1px solid var(--border); vertical-align: middle; font-size: 0.85rem; color: var(--text-dim); }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover td { background: #fafbff; }
+    .btn-danger { background: #fff5f5; color: var(--danger); border: 1px solid #fed7d7; border-radius: 6px; padding: 0.4rem 0.75rem; cursor: pointer; font-size: 0.78rem; transition: background 0.15s; display: inline-flex; align-items: center; gap: 0.35rem; }
+    .btn-danger:hover { background: #ffe4e4; }
+    .table-footer { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.5rem; border-top: 1px solid var(--border); background: var(--surface2); font-size: 0.78rem; color: var(--text-muted); }
+    .pagination { display: flex; gap: 0.3rem; align-items: center; }
+    .page-btn { width: 30px; height: 30px; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; color: var(--text-dim); font-size: 0.78rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+    .page-btn:hover:not(:disabled) { background: var(--accent-bg); color: var(--accent); border-color: rgba(66,122,181,0.3); }
+    .page-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 200; display: none; align-items: center; justify-content: center; backdrop-filter: blur(3px); }
+    .modal-overlay.open { display: flex; }
+    .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; width: 100%; max-width: 460px; padding: 1.75rem; box-shadow: var(--shadow-md); }
+    .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
+    .modal-title { font-size: 1rem; font-weight: 700; color: var(--text); }
+    .modal-close { width: 32px; height: 32px; background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; display: flex; align-items: center; justify-content: center; color: var(--text-dim); cursor: pointer; font-size: 0.85rem; }
+    .modal-close:hover { background: var(--border); }
+    .form-group { margin-bottom: 1rem; }
+    .form-label { display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-dim); margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    .form-input, .form-select { width: 100%; background: var(--surface2); border: 1.5px solid var(--border); border-radius: 8px; color: var(--text); font-size: 0.88rem; padding: 0.7rem 0.9rem; outline: none; transition: border-color 0.2s; box-sizing: border-box; }
+    .form-input:focus, .form-select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(66,122,181,0.1); }
+    .form-input::placeholder { color: var(--text-muted); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .modal-actions { display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+</style>
+
+<div class="page-header">
+    <div>
+        <div class="page-title">Kupon Yönetimi</div>
+        <div class="page-sub">Kuponları görüntüleyin ve yönetin</div>
+    </div>
+    <button class="btn-primary" onclick="openModal()"><i class="fas fa-plus"></i> Yeni Kupon</button>
+</div>
+
+<div class="stat-row">
+    <div class="stat-mini">
+        <div class="stat-mini-icon icon-blue"><i class="fas fa-ticket"></i></div>
+        <div>
+            <div class="stat-mini-value" id="statTotal">@ViewBag.TotalCoupons</div>
+            <div class="stat-mini-label">Toplam Kupon</div>
+        </div>
+    </div>
+    <div class="stat-mini">
+        <div class="stat-mini-icon icon-green"><i class="fas fa-check-circle"></i></div>
+        <div>
+            <div class="stat-mini-value">@ViewBag.ActiveCoupons</div>
+            <div class="stat-mini-label">Aktif Kupon</div>
+        </div>
+    </div>
+</div>
+
+<div class="table-wrap">
+    <div class="table-toolbar">
+        <div class="toolbar-left">
+            <input type="text" id="searchInput" class="search-input" placeholder="Kupon kodu ara..." oninput="applyFilters()" style="width:220px" />
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Kupon Kodu</th>
+                <th>İndirim</th>
+                <th>Min. Sipariş</th>
+                <th>Son Kullanma</th>
+                <th>İşlem</th>
+            </tr>
+        </thead>
+        <tbody id="couponTbody">
+            <tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--text-muted)"><i class="fas fa-spinner fa-spin"></i> Yükleniyor...</td></tr>
+        </tbody>
+    </table>
+
+    <div class="table-footer">
+        <span id="paginationInfo"></span>
+        <div class="pagination" id="pagination"></div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="createModal" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+        <div class="modal-header">
+            <div class="modal-title"><i class="fas fa-ticket" style="color:var(--accent);margin-right:0.5rem"></i> Yeni Kupon Oluştur</div>
+            <div class="modal-close" onclick="closeModal()"><i class="fas fa-xmark"></i></div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Kupon Kodu *</label>
+            <input type="text" class="form-input" id="newCode" placeholder="Örn: BERKAY20" style="text-transform:uppercase" />
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">İndirim Tipi *</label>
+                <select class="form-select" id="newType">
+                    <option value="1">Yüzde (%)</option>
+                    <option value="2">Sabit Tutar (₺)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">İndirim Değeri *</label>
+                <input type="number" class="form-input" id="newValue" placeholder="20" min="1" />
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">Min. Sipariş Tutarı</label>
+                <input type="number" class="form-input" id="newMinOrder" placeholder="500" min="0" />
+            </div>
+            <div class="form-group">
+                <label class="form-label">Kullanım Limiti</label>
+                <input type="number" class="form-input" id="newUsageLimit" placeholder="100" min="0" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Son Kullanma Tarihi</label>
+            <input type="datetime-local" class="form-input" id="newExpiresAt" />
+        </div>
+
+        <div class="modal-actions">
+            <button class="btn-secondary" onclick="closeModal()">İptal</button>
+            <button class="btn-primary" id="createBtn" onclick="createCoupon()"><i class="fas fa-plus"></i> Oluştur</button>
+        </div>
+    </div>
+</div>
