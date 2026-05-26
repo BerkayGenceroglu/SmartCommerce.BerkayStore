@@ -487,6 +487,7 @@ Visual Studio → **Multiple Startup Projects** ayarla:
 <img width="1866" height="955" alt="image" src="https://github.com/user-attachments/assets/27a72bc8-0bbf-48f3-9670-32afb104cc69" />
 <img width="1871" height="955" alt="image" src="https://github.com/user-attachments/assets/ea372f26-15cd-4a4d-8bf6-0035101936a1" />
 <img width="1852" height="695" alt="image" src="https://github.com/user-attachments/assets/d8b99be1-dd6e-4b76-ae23-ed92d338ac5b" />
+<img width="1869" height="953" alt="image" src="https://github.com/user-attachments/assets/02043083-aa78-480e-bbea-efd0b69f3f78" />
 
 </details>
 
@@ -499,6 +500,8 @@ Visual Studio → **Multiple Startup Projects** ayarla:
 <img width="1869" height="952" alt="image" src="https://github.com/user-attachments/assets/d5ecb7c3-6a9b-4722-bc2e-cf90ad3edfbb" />
 <img width="1864" height="955" alt="image" src="https://github.com/user-attachments/assets/7ae42e1d-57a7-46f7-85fc-9fe250690792" />
 <img width="1866" height="959" alt="image" src="https://github.com/user-attachments/assets/90897b0a-1cb1-4df4-82f4-abff0e10bedb" />
+<img width="1865" height="950" alt="image" src="https://github.com/user-attachments/assets/9f9194ff-f26e-441c-9ad2-b7966ede77d9" />
+<img width="1868" height="950" alt="image" src="https://github.com/user-attachments/assets/8e5dc473-aaae-4b4c-8f89-bbe1e665205e" />
 
 
 </details>
@@ -506,14 +509,35 @@ Visual Studio → **Multiple Startup Projects** ayarla:
 <details>
 <summary>Ürün Detay Sayfası</summary>
 
-> 📷 _Buraya ürün detay (görsel, açıklama, fiyat, sepete ekle) ekran görüntüsü ekle_
+<img width="1874" height="962" alt="image" src="https://github.com/user-attachments/assets/699e2480-9689-4313-b561-7b47bb22edc8" />
+<img width="1869" height="962" alt="image" src="https://github.com/user-attachments/assets/03f6ed01-67fb-48a5-9493-8cbe64f3f835" />
+<img width="1865" height="955" alt="image" src="https://github.com/user-attachments/assets/f19f324b-c329-42eb-aa9e-952e7e5620f8" />
+
+
+</details>
+
+<details>
+<summary>Ürün Detay Yorum ve Değerlendirme</summary>
+<img width="1866" height="960" alt="image" src="https://github.com/user-attachments/assets/2e4a2694-be32-4033-a7af-5164f2c0498d" />
+<img width="1871" height="956" alt="image" src="https://github.com/user-attachments/assets/c74f24a9-d230-4404-bb05-0eb99fdbb7f9" />
+
+
+
+</details>****
+
+<details>
+<summary>Favoriler Sayfası</summary>
+
+<img width="1868" height="956" alt="image" src="https://github.com/user-attachments/assets/6b263123-8fd0-4472-b64d-34e6b4e127e6" />
+<img width="1874" height="957" alt="image" src="https://github.com/user-attachments/assets/b7c7153f-e2dd-488a-8a27-f41a6e2b0445" />
+
 
 </details>
 
 <details>
 <summary>Sepet Sayfası</summary>
 
-> 📷 _Buraya sepet (ürün listesi, kupon kodu, toplam) ekran görüntüsü ekle_
+
 
 </details>
 
