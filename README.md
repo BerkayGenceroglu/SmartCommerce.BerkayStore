@@ -8,21 +8,6 @@
 
 ---
 
-## İçindekiler
-
-- [Proje Tanıtımı](#proje-tanıtımı)
-- [Kullanılan Teknolojiler](#kullanılan-teknolojiler)
-- [Sistem Mimarisi](#sistem-mimarisi)
-- [Servis Detayları](#servis-detayları)
-- [Akış Süreçleri](#akış-süreçleri)
-- [Özellikler](#özellikler)
-- [Ekran Görüntüleri](#ekran-görüntüleri)
-- [Kurulum](#kurulum)
-- [API Referansı](#api-referansı)
-- [Veritabanı Şeması](#veritabanı-şeması)
-
----
-
 ## Proje Tanıtımı
 
 SmartCommerce, modern e-ticaret ihtiyaçlarını karşılamak üzere **mikroservis mimarisi** ile geliştirilmiş kapsamlı bir platformdur. Proje; bağımsız çalışabilen API servisleri, event-driven worker servisleri, gerçek zamanlı arama motoru ve eksiksiz bir admin yönetim panelinden oluşmaktadır.
