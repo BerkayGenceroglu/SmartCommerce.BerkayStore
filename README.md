@@ -474,7 +474,7 @@ Visual Studio → **Multiple Startup Projects** ayarla:
 </details>
 
 ---
-
+ 
 ### 🏠 Kullanıcı Arayüzü
 
 <details>
