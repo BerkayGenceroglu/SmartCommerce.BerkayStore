@@ -247,7 +247,6 @@ POST /api/auth/login  →  Email + şifre
 <img width="1866" height="955" alt="Ana Sayfa 5" src="https://github.com/user-attachments/assets/27a72bc8-0bbf-48f3-9670-32afb104cc69" />
 <img width="1871" height="955" alt="Ana Sayfa 6" src="https://github.com/user-attachments/assets/ea372f26-15cd-4a4d-8bf6-0035101936a1" />
 <img width="1852" height="695" alt="Ana Sayfa Footer" src="https://github.com/user-attachments/assets/d8b99be1-dd6e-4b76-ae23-ed92d338ac5b" />
-<img width="1869" height="953" alt="Ana Sayfa 8" src="https://github.com/user-attachments/assets/02043083-aa78-480e-bbea-efd0b69f3f78" />
 
 ---
 
@@ -268,8 +267,6 @@ POST /api/auth/login  →  Email + şifre
 #### Ürün Detay
 > Varyantlar (renk, beden, numara, kapasite vb.) dinamik butonlarla seçilir. Seçime göre fiyat farkı (PriceModifier) anlık güncellenir.
 
-<img width="1874" height="962" alt="Ürün Detay 1" src="https://github.com/user-attachments/assets/699e2480-9689-4313-b561-7b47bb22edc8" />
-<img width="1869" height="962" alt="Ürün Detay 2" src="https://github.com/user-attachments/assets/03f6ed01-67fb-48a5-9493-8cbe64f3f835" />
 <img width="1865" height="955" alt="Ürün Detay 3" src="https://github.com/user-attachments/assets/f19f324b-c329-42eb-aa9e-952e7e5620f8" />
 
 ---
@@ -285,7 +282,6 @@ POST /api/auth/login  →  Email + şifre
 #### Favorilerim
 > Ürün kartlarındaki kalp ikonuyla favoriye ekleme/çıkarma yapılır. Her üründen doğrudan sepete ekleme yapılabilir.
 
-<img width="1868" height="956" alt="Favoriler 1" src="https://github.com/user-attachments/assets/6b263123-8fd0-4472-b64d-34e6b4e127e6" />
 <img width="1874" height="957" alt="Favoriler 2" src="https://github.com/user-attachments/assets/b7c7153f-e2dd-488a-8a27-f41a6e2b0445" />
 
 ---
@@ -293,10 +289,6 @@ POST /api/auth/login  →  Email + şifre
 #### Sepet
 > Sepet verileri Redis'te `cart:{userId}` anahtarıyla tutulur, 30 dakika TTL uygulanır. Kupon kodu ile yüzde veya sabit tutar indirimi uygulanabilir.
 
-<img width="1865" height="953" alt="Sepet 1" src="https://github.com/user-attachments/assets/0c95751c-f4d9-4fea-942c-bccdb71e5cad" />
-<img width="1864" height="953" alt="Sepet 2" src="https://github.com/user-attachments/assets/67d70c53-91c1-47ff-ab1b-ecb4b1ef874a" />
-<img width="1870" height="951" alt="Sepet 3" src="https://github.com/user-attachments/assets/fc34838b-8c3a-493f-b718-4fe710e44411" />
-<img width="1869" height="954" alt="Sepet 4" src="https://github.com/user-attachments/assets/373fed01-195e-4a28-9574-c61bf34bef2e" />
 <img width="1863" height="955" alt="Sepet 5" src="https://github.com/user-attachments/assets/bdccb3c6-fb47-42f9-b151-34d33314bda8" />
 
 ---
