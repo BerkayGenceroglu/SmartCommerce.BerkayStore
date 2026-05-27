@@ -387,35 +387,44 @@ POST /api/auth/login  →  Email + şifre
 #### PostgreSQL
 > Ana ilişkisel veritabanı. `Host: localhost · Port: 5433 · DB: SmartCommerce · User: admin`. Users, Products, Orders, Cargos, Invoices tabloları burada tutulur.
 
-> 📷 _PostgreSQL ekran görüntüsünü buraya ekleyin_
+
+<img width="668" height="815" alt="image" src="https://github.com/user-attachments/assets/81ad8522-7421-4215-a1fb-e894549977fc" />
+
+<img width="1461" height="344" alt="image" src="https://github.com/user-attachments/assets/18905abb-ed6a-4e50-a8e6-a48103b12eb7" />
+
+<img width="1443" height="401" alt="image" src="https://github.com/user-attachments/assets/1d08576f-e136-4dda-88ae-143e7be5f86d" />
+
+<img width="367" height="258" alt="image" src="https://github.com/user-attachments/assets/1369ea14-7547-42b6-b488-eb67d829bc19" />
 
 ---
 
 #### Redis
 > Ürün listesi cache (TTL: 5 dk) ve sepet yönetimi (`cart:{userId}`) için kullanılır. Port: `6381`.
+<img width="1867" height="948" alt="image" src="https://github.com/user-attachments/assets/df55d8ff-1b12-417f-9f37-18bc31c6192c" />
 
-> 📷 _Redis ekran görüntüsünü buraya ekleyin_
 
 ---
 
 #### Elasticsearch & Kibana
 > Ürünler PostgreSQL'e kaydedilirken aynı zamanda Elasticsearch'e indekslenir. Serilog ile tüm servis logları Elasticsearch'e yazılır, Kibana'dan izlenir. Port: `9204` (ES) · `5604` (Kibana).
 
-> 📷 _Elasticsearch / Kibana ekran görüntüsünü buraya ekleyin_
+<img width="1916" height="958" alt="image" src="https://github.com/user-attachments/assets/dec80dd4-3b12-4560-a59b-73de92e99050" />
 
 ---
 
 #### Serilog — Merkezi Loglama
 > Her servis ve worker loglarını hem konsola hem Elasticsearch'e yazar. Index formatı: `{servisadi}-logs-{yil.ay}`.
 
-> 📷 _Serilog / Kibana log akışı ekran görüntüsünü buraya ekleyin_
+<img width="1920" height="948" alt="image" src="https://github.com/user-attachments/assets/a6e3b0a3-e6c6-464e-b519-9b68f6c78d61" />
+
 
 ---
 
 #### RabbitMQ Management
 > `OrderCreated` event'i Fanout exchange ile 5 kuyruğa düşer. Her worker kendi kuyruğunu bağımsız tüketir. Management UI: `http://localhost:15674`.
 
-> 📷 _RabbitMQ Management UI ekran görüntüsünü buraya ekleyin_
+<img width="1882" height="932" alt="image" src="https://github.com/user-attachments/assets/ea757c9a-d7ab-437e-9a8d-2d4f607401ff" />
+<img width="1123" height="519" alt="image" src="https://github.com/user-attachments/assets/213a7073-124c-4bb0-9f9a-6ae68c829777" />
 
 ---
 
@@ -423,6 +432,8 @@ POST /api/auth/login  →  Email + şifre
 > Tüm altyapı `docker compose up -d` ile ayağa kalkar. Her API JWT destekli Swagger UI ile dökümante edilmiştir.
 
 > 📷 _Docker Desktop ve Swagger UI ekran görüntüsünü buraya ekleyin_
+<img width="1624" height="415" alt="image" src="https://github.com/user-attachments/assets/32ab3752-6ba7-40eb-a5c4-d90ad5e86704" />
+<img width="1685" height="776" alt="image" src="https://github.com/user-attachments/assets/edb5d37d-3c1b-4791-9b47-ecb679896357" />
 
 ---
 
@@ -497,16 +508,28 @@ Visual Studio → **Multiple Startup Projects**:
 
 ---
 
-## Geliştirici
-
-<div align="center">
+## 👤 Geliştirici
 
 **Berkay Gençeroğlu**
 
-[![GitHub](https://img.shields.io/badge/GitHub-BerkayGenceroglu-181717?style=flat-square&logo=github)](https://github.com/BerkayGenceroglu)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Berkay%20Gençeroğlu-0A66C2?style=flat-square&logo=linkedin)](https://www.linkedin.com/in/berkay-gencero%C4%9Flu-586b52331/)
-[![Email](https://img.shields.io/badge/Email-berkaygenceroglu6@gmail.com-EA4335?style=flat-square&logo=gmail)](mailto:berkaygenceroglu6@gmail.com)
+- GitHub: [@BerkayGenceroglu](https://github.com/BerkayGenceroglu)
+- LinkedIn: [Berkay Gençeroğlu](https://www.linkedin.com/in/berkay-gencero%C4%9Flu-586b52331/)
 
-*Bu proje portfolyo amaçlı geliştirilmiştir. Gerçek bir ticari işletme değildir.*
+---
 
-</div>
+## 📫 İletişim
+
+Proje hakkında sorularınız, önerileriniz ya da katkı istekleriniz için benimle iletişime geçebilirsiniz:
+
+- 📧 E-posta: **berkaygenceroglu6@gmail.com**
+- 🔗 LinkedIn: [Berkay Gençeroğlu](https://www.linkedin.com/in/berkay-gencero%C4%9Flu-586b52331/)
+
+---
+
+## 💬 Son Söz
+<img width="536" height="339" alt="image" src="https://github.com/user-attachments/assets/21e048ea-6fb0-4816-902c-897af787645e" />
+
+Teşekkürler! Bu projeyi incelediğiniz için memnuniyet duyarım.  
+Her türlü geri bildirime açığım.
+
+**İyi kodlamalar! 🚀**
