@@ -1,6 +1,6 @@
 <div align="center">
 
-# SmartCommerce · Berkay Store
+# SmartCommerce - Berkay Store
 
 **Mikroservis mimarisi üzerine inşa edilmiş, production-ready e-ticaret platformu**
 
